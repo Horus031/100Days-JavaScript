@@ -4,8 +4,85 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To-Do App</title>
+    <link rel="stylesheet" href="/public/output.css">
 </head>
-<body>
-    <h1>Hello World</h1>
+<body class="bg-gray font-[Inter]">
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header -->
+            <header class="bg-white border-b border-gray-200">
+                <div class="flex items-center justify-between p-4">
+                    <div class="flex items-center flex-1 space-x-4">
+                        <button class="md:hidden p-2 rounded-lg hover:bg-gray-100">
+                            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                        </button>
+                        <div class="flex-1 max-w-md">
+                            <div class="relative">
+                                <input type="text" name="" id="" placeholder="Search task..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button class="p-2 rounded-lg hover:bg-gray-100">
+                            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                            </svg>
+                        </button>
+                        <div class="flex items-center space-x-2">
+                            <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e" alt="Profile" class="w-8 h-8 rounded-full">
+                            <span class="text-sm font-medium text-gray-700 w-[50px] line-clamp-1 text-wrap md:w-full">Horus Weaver</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Task Container -->
+            <div class="flex-1 overflow-auto py-4 px-2 space-y-4">
+                <!-- Updated New Task Input -->
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 space-y-4">
+                    <div class="flex items-center space-x-4">
+                        <input type="text" name="" id="" placeholder="Add a new task..." class="flex-1 px-4 py-2 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white">
+                        <button class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                            Add Task
+                        </button>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex space-x-4">
+                            <select class="px-3 py-1.5 bg-gray-100 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Priority</option>
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                            <select class="px-3 py-1.5 bg-gray-100 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Category</option>
+                                <option value="personal">Personal</option>
+                                <option value="work">Work</option>
+                                <option value="shopping">Shopping</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="date" class="px-3 py-1.5 bg-gray-100 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task Lists -->
+                <div class="space-y-4">
+                    <div>
+                        Test
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
 </body>
 </html>
