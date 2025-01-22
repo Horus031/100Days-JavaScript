@@ -6,23 +6,67 @@
     <title>To-Do App</title>
     <link rel="stylesheet" href="/public/output.css">
 </head>
-<body class="bg-gray font-[Inter]">
-    <div class="flex h-screen overflow-hidden">
+<body class=" font-sans">
+    <div class="relative flex h-screen overflow-hidden ">
+        <!-- Menu -->
+        <aside id="menu" class="absolute w-64 bg-white dark:bg-slate-800 dark:border-gray-500 hidden size-full z-10 border-r border-gray-200  md:flex md:flex-col md:static transition-all">
+            <div class="p-4 flex justify-between">
+                <div class="flex items-center space-x-2">
+                    <img src="./assets/todo-img.png" alt="" class="w-8 h-8 rounded">
+                    <h1 class="dark:text-white text-xl font-bold text-gray-800">TodoApp</h1>
+                </div>
+                <button onclick="toggleMenu()" class="hover:bg-gray-200 p-2 rounded-md md:hidden transition-all">
+                    <svg class="w-5 h-5 dark:fill-white" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 16 16" version="1.1">
+                        <rect width="16" height="16" id="icon-bound" fill="none"/>
+                        <polygon points="14.707,2.707 13.293,1.293 8,6.586 2.707,1.293 1.293,2.707 6.586,8 1.293,13.293 2.707,14.707 8,9.414   13.293,14.707 14.707,13.293 9.414,8 "/>
+                    </svg>
+                </button>
+            </div>
+
+            <nav class="flex-1 p-4 space-y-4">
+                <div class="space-y-2">
+                    <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">CATEGORIES</h2>
+                    <div class="space-y-1">
+                        <button class="dark:text-gray-400 flex items-center w-full px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100">
+                            <span class="w-2 h-2 mr-3 bg-blue-500 rounded-full"></span>
+                            Personal
+                        </button>
+                        <button class="dark:text-gray-400 flex items-center w-full px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100">
+                            <span class="w-2 h-2 mr-3 bg-green-500 rounded-full"></span>
+                            Work
+                        </button>
+                        <button class="dark:text-gray-400 flex items-center w-full px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100">
+                            <span class="w-2 h-2 mr-3 bg-purple-500 rounded-full"></span>
+                            Shopping
+                        </button>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Labels</h2>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded-full">#important</span>
+                        <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">#daily</span>
+                        <span class="px-2 py-1 text-xs font-medium bg-purple-100 text-purple-700 rounded-full">#meeting</span>
+                    </div>
+                </div>
+            </nav>
+        </aside>
 
         <!-- Main Content -->
         <main class="flex-1 flex flex-col overflow-hidden">
             <!-- Header -->
-            <header class="bg-white border-b border-gray-200">
+            <header id="header" class="bg-white dark:bg-slate-800 dark:border-gray-500 border-b border-gray-200 transition-all">
                 <div class="flex items-center justify-between p-4">
                     <div class="flex items-center flex-1 space-x-4">
-                        <button class="md:hidden p-2 rounded-lg hover:bg-gray-100">
-                            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <button onclick="toggleMenu()" class="md:hidden p-2 rounded-lg hover:bg-gray-100">
+                            <svg class="w-6 h-6 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                             </svg>
                         </button>
                         <div class="flex-1 max-w-md">
                             <div class="relative">
-                                <input type="text" name="" id="" placeholder="Search task..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <input type="text" name="" id="" placeholder="Search task..." class="dark:bg-transparent w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                                 <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                 </svg>
@@ -30,39 +74,39 @@
                         </div>
                     </div>
                     <div class="flex items-center space-x-4">
-                        <button class="p-2 rounded-lg hover:bg-gray-100">
-                            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        <button id="darkButton" class="p-2 rounded-lg hover:bg-gray-100">
+                            <svg id="darkIcon" class="w-6 h-6 text-black dark:text-yellow-400 dark:fill-yellow-400 fill-white" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
                             </svg>
                         </button>
                         <div class="flex items-center space-x-2">
                             <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e" alt="Profile" class="w-8 h-8 rounded-full">
-                            <span class="text-sm font-medium text-gray-700 w-[50px] line-clamp-1 text-wrap md:w-full">Horus Weaver</span>
+                            <span class="dark:text-white text-sm font-medium text-gray-700 w-[50px] line-clamp-1 text-wrap md:w-full">Horus Weaver</span>
                         </div>
                     </div>
                 </div>
             </header>
 
             <!-- Task Container -->
-            <div class="flex-1 overflow-auto py-4 px-2 space-y-4">
+            <div class="flex-1 overflow-auto py-4 px-2 space-y-4 bg-gray-100 dark:bg-slate-950 transition-all">
                 <!-- Updated New Task Input -->
-                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 space-y-4">
+                <div class="bg-white dark:bg-slate-700 dark:border-gray-500 p-4 rounded-lg shadow-sm border border-gray-200 space-y-4 transition-all">
                     <div class="flex items-center space-x-4">
-                        <input type="text" name="" id="" placeholder="Add a new task..." class="flex-1 px-4 py-2 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white">
-                        <button class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        <input type="text" name="" id="taskInput" placeholder="Add a new task..." class=" flex-1 px-4 py-2 text-gray-700 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white">
+                        <button id="inputButton" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 active:scale-90">
                             Add Task
                         </button>
                     </div>
 
                     <div class="flex items-center justify-between">
                         <div class="flex space-x-4">
-                            <select class="px-3 py-1.5 bg-gray-100 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <select id="taskPriority" class="px-3 py-1.5 bg-gray-100 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">Priority</option>
                                 <option value="high">High</option>
                                 <option value="medium">Medium</option>
                                 <option value="low">Low</option>
                             </select>
-                            <select class="px-3 py-1.5 bg-gray-100 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <select id="taskType" class="px-3 py-1.5 bg-gray-100 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">Category</option>
                                 <option value="personal">Personal</option>
                                 <option value="work">Work</option>
@@ -76,13 +120,70 @@
                 </div>
 
                 <!-- Task Lists -->
-                <div class="space-y-4">
-                    <div>
-                        Test
+                <div id="list" class="space-y-4">
+                    <div id="items" class="bg-white dark:bg-slate-800 dark:border-gray-500 border-2 border-gray-200 rounded-lg p-4 hover:shadow-md transition-all">
+                        <div class="flex items-center justify-between">
+                            <div class="flex space-x-4 items-center">
+                                <input type="checkbox" name="" id="" class="size-5">
+                                <div>
+                                    <h3 class="dark:text-white text-sm font-medium text-gray-900">Complete project presentation</h3>
+                                    <div class="flex items-center space-x-2 mt-1">
+                                        <span class="dark:text-gray-400 text-xs text-gray-500">Due Today</span>
+                                        <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
+                                        <span class="px-2 py-0.5 text-xs font-medium bg-red-100 text-red-700 rounded-full">High Priority</span>
+                                        <span class="px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-700 rounded-full">Work</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <button class=" hover:bg-gray-100 rounded-md p-1">
+                                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                    </svg>
+                                </button>
+    
+                                <button class="hover:bg-gray-100 rounded-md ml-3 p-1">
+                                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
                     </div>
+                    <!-- <div class="bg-white dark:bg-slate-800 dark:border-gray-500 border-2 border-gray-200 rounded-lg p-4 hover:shadow-md transition-all">
+                        <div class="flex items-center justify-between ">
+                            <div class="flex space-x-4 items-center">
+                                <input type="checkbox" name="" id="" class="size-5">
+                                <div>
+                                    <h3 class="dark:text-white text-sm font-medium text-gray-900">Buy groceries</h3>
+                                    <div class="flex items-center space-x-2 mt-1">
+                                        <span class="dark:text-gray-400 text-xs text-gray-500">Tomorrow</span>
+                                        <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
+                                        <span class="px-2 py-0.5 text-xs font-medium bg-yellow-100 text-yellow-700 rounded-full">Medium Priority</span>
+                                        <span class="px-2 py-0.5 text-xs font-medium bg-purple-100 text-purple-700 rounded-full">Shopping</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <button class=" hover:bg-gray-100 rounded-md p-1">
+                                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                    </svg>
+                                </button>
+    
+                                <button class="hover:bg-gray-100 rounded-md ml-3 p-1">
+                                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div> -->
                 </div>
             </div>
         </main>
     </div>
+
+    <script src="./scripts/index.js"></script>
 </body>
 </html>

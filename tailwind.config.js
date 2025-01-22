@@ -5,6 +5,7 @@ module.exports = {
     "./projects/**/*.js",
     "./projects/**/script.js",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       keyframes: {
@@ -19,11 +20,16 @@ module.exports = {
         translateTop: {
           '0%' : { transform: 'translateY(0)' },
           '100%': { transform: 'translateY(-100px)'}
+        },
+        menuTransition: {
+          '0%': { transform: 'translateX(-100%)'},
+          '100%': { transform: 'translateX(0)'}
         }
       },
       animation: {
         wiggle: 'wiggle 1s ease-in-out infinite',
         fadeSequence: 'translateTop 0.5s ease, fadeOut 0.5s ease forwards',
+        menuTransition: 'menuTransition 0.8s ease',
       },
       
     },
