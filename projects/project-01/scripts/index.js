@@ -19,6 +19,7 @@ function toggleMenu() {
     menuBlock.classList.toggle('animate-menuTransition');
 }
 
+// Object app dùng để chứa tất cả các thuộc tính và function 
 const app = {
     isDark: false,
     config: JSON.parse(localStorage.getItem(userKey)) || {},
@@ -26,6 +27,7 @@ const app = {
         this.config[key] = value;
         localStorage.setItem(userKey, JSON.stringify(this.config));
     },
+    // Hàm dùng để render giao diện và check các điều kiện hiển thị
     renderLists: function() {
         const htmls = todos.map((todo, index) => {
             return `
@@ -35,11 +37,11 @@ const app = {
                             <input type="checkbox" name="" id="" class="size-5">
                             <div id="item-info">
                                 <h3 id="todoName-${index + 1}" class="dark:text-white text-sm font-medium text-gray-900">${todo.name}</h3>
-                                <div class="flex items-center space-x-2 mt-1">
-                                    <span class="dark:text-gray-400 text-xs text-gray-500">${todo.deadline}</span>
+                                <div id="info-${index + 1}" class="flex items-center space-x-2 mt-1">
+                                    <span class="deadline dark:text-gray-400 text-xs text-gray-500">${todo.deadline}</span>
                                     <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
-                                    <span = class="priority px-2 py-0.5 text-xs font-medium rounded-full">${todo.priority}</span>
-                                    <span = class="type px-2 py-0.5 text-xs font-medium rounded-full">${todo.type}</span>
+                                    <span class="priority px-2 py-0.5 text-xs font-medium rounded-full">${todo.priority}</span>
+                                    <span class="type px-2 py-0.5 text-xs font-medium rounded-full">${todo.type}</span>
                                 </div>
                             </div>
                         </div>
@@ -68,13 +70,13 @@ const app = {
         }).join('');
         listBlock.innerHTML = htmls;
 
-        // Xử lý các loại priority và type
+        // Xử lý các loại thời gian, priority và type
         this.checkPriority();
-        
+
         this.checkType();
-        
     },
 
+    // Hàm để xử lý màu hiển thị của Priority trên giao diện
     checkPriority: function() {
         const priorityLists = document.querySelectorAll('.priority');
         const priorityArray = Array.from(priorityLists);
@@ -94,6 +96,7 @@ const app = {
         })
     },
 
+    // Hàm để xử lý màu hiển thị của Type trên giao diện
     checkType: function() {
         const typeLists = document.querySelectorAll('.type');
         const typeArray = Array.from(typeLists);
@@ -107,11 +110,49 @@ const app = {
                     elem.classList.add('bg-orange-100', 'text-orange-700');
                     break;
                 case 'Shopping':
-                    elem.classList.add('bg-purple-100', 'bg-purple-700');
+                    elem.classList.add('bg-purple-100', 'text-purple-700');
             }
         })
     },
 
+    // Hàm để xử lý thời gian
+    checkDateAndRender: function() {
+        const oneDayTime = 24 * 60 * 60 * 1000;  // 24 giờ tính bằng mili giây
+        const currentTime = new Date();
+        const currentMs = currentTime.getTime();
+        // Lấy các giá trị thời gian từ Local Storage
+        const deadlineList = todos.map(todo => {
+            return todo.deadline;
+        })
+        // Chuyển đổi các giá trị thời gian về 0
+        function setMidnight(time) {
+            const date = new Date(time);
+            date.setHours(0, 0, 0, 0);
+            return date.getTime();
+        }
+        
+        const currentMidnight = setMidnight(currentMs);
+        const formattedDeadline = deadlineList.map(time => setMidnight(new Date(time).getTime()));
+
+        formattedDeadline.forEach((time, index) => {
+            const dayDiff = Math.floor((time - currentMidnight) / oneDayTime);
+            let newDeadline;
+            if (dayDiff === 0) {
+                newDeadline = 'Today';
+            } else if (dayDiff === 1) {
+                newDeadline = 'Tomorrow';
+            }
+
+            if (newDeadline) {
+                todos[index].deadline = `Due ${newDeadline}`;
+                localStorage.setItem('todos', JSON.stringify(todos));
+            }
+        })
+
+        this.renderLists();
+    },
+
+    // Tạo thuộc tính viết hoa chữ cái đầu cho đối tượng String
     defineProperties: function() {
         Object.defineProperty(String.prototype, 'capitalize', {
             value: function() {
@@ -121,6 +162,7 @@ const app = {
         });
     },
 
+    // Hàm để xử lý tất cả sự kiện trên trình duyệt
     handleEvents: function() {
         const _this = this;
         const inputValue = document.getElementById('taskInput');
@@ -130,16 +172,16 @@ const app = {
         document.addEventListener('DOMContentLoaded', function() {
             
             // Bật/Tắt Dark Mode
-            darkButton.onclick = function() {
+            darkButton.addEventListener('click', function() {
                 _this.isDark = !_this.isDark;
                 _this.setConfig('isDark', _this.isDark);
                 darkButton.classList.toggle('fill-white');
                 darkButton.classList.toggle('fill-yellow-400');
                 htmlElement.classList.toggle('dark', _this.isDark);
-            }
+            })
 
-
-            headerBlock.oninput = function(e) {
+            // Tìm task
+            headerBlock.addEventListener('input', function(e) {
                 if(e.target.id === 'searchInput') {
                     let searchValue = searchInput.value.toLowerCase().trim();
                     const listItems = Array.from(listBlock.children);
@@ -148,10 +190,10 @@ const app = {
                         item.style.display = todoName.includes(searchValue) ? 'block' : 'none';
                     });
                 }
-            }
+            })
 
             // Thêm task
-            inputButton.onclick = function() {
+            inputButton.addEventListener('click', function() {
                 if (inputValue.value.trim() !== '') {
                     todos.push({
                         id: todos.length + 1,
@@ -162,9 +204,9 @@ const app = {
                     })
                     localStorage.setItem('todos', JSON.stringify(todos));
                     inputValue.value = '';
-                    _this.renderLists();
+                    _this.checkDateAndRender();    
                 }
-            }
+            })
 
             
 
@@ -175,6 +217,10 @@ const app = {
                 const saveTaskButton = taskElement.querySelector('#saveTaskBtn');
                 const adjustTaskButton = taskElement.querySelector('#adjustTaskBtn');
                 let taskText = taskElement.querySelector('h3[id^="todoName-"]');
+                let infoBlock = taskElement.querySelector('div[id^="info-"]')
+                let taskPrior = taskElement.querySelector('.priority');
+                let taskType = taskElement.querySelector('.type');
+
                 // Nếu ấn nút xóa task
                 if (e.target.closest('#deleteTaskBtn')) {
                     todos.splice(taskId, 1);
@@ -188,11 +234,27 @@ const app = {
                     let taskItem = taskText.parentElement;
                     let currentText = taskText.textContent;
 
+
                     // Tạo ra ô input
                     let inputField = document.createElement('input');
                     inputField.type = 'text';
                     inputField.className = 'border border-gray-300 rounded-lg p-1 pl-2 text-gray-300 bg-transparent'
                     inputField.value = currentText;
+
+                    // Tạo ra ô select priority
+                    const originalPriorSelect = document.getElementById('taskPriority');
+                    const originalTypeSelect = document.getElementById('taskType');
+
+                    let selectPriorField = document.createElement('select');
+                    selectPriorField.id = 'priority';
+                    selectPriorField.className = originalPriorSelect.className;
+                    selectPriorField.innerHTML = originalPriorSelect.innerHTML;
+
+                    // Tạo ra ô select type
+                    let selectTypeField = document.createElement('select');
+                    selectTypeField.id = 'type';
+                    selectTypeField.className = originalTypeSelect.className;
+                    selectTypeField.innerHTML = originalTypeSelect.innerHTML;
 
                     // Thoát focus của phần tử hiện tại
                     if (document.activeElement) {
@@ -201,35 +263,66 @@ const app = {
                     
                     // Thay thế nội dung bằng input
                     taskItem.replaceChild(inputField, taskText);
+                    infoBlock.replaceChild(selectPriorField, taskPrior);
+                    infoBlock.replaceChild(selectTypeField, taskType);
                     inputField.focus(); // Thêm focus vào input sửa task
                     saveTaskButton.classList.remove('hidden');
                     adjustTaskButton.classList.add('hidden');
                 } else if (e.target.closest('#saveTaskBtn')) {
+
+                    // Tạo ra các biến chứa giá trị mới
                     let newInputField = taskElement.querySelector('input[type="text"]');
                     let taskItem = newInputField.parentElement;
                     let newValue = newInputField.value;
 
+                    // Tạo ra hai biến chứa các giá trị select mới
+                    let newPriorField = taskElement.querySelector('select[id="priority"]');
+                    let newPriorValue = newPriorField.value.capitalize();
+                    let newTypeField = taskElement.querySelector('select[id="type"]');
+                    let newTypeValue = newTypeField.value.capitalize();
+
                     // Tạo ra heading chứa thông tin sau khi sửa
                     let newTextTask = document.createElement('h3');
+                    let newPriorBlock = document.createElement('span');
+                    let newTypeBlock = document.createElement('span');
+
+                    // Cấu hình cho thẻ title mới
                     newTextTask.id = `todoName-${taskId + 1}`;
                     newTextTask.className = 'dark:text-white text-sm font-medium text-gray-900';
                     newTextTask.textContent = newValue;
 
-                    _this.updateNewInfo(taskId, newValue);
+                    // Cấu hình cho các thẻ select mới
+                    if (newPriorValue == '' || newTypeValue == '') {
+                        alert('You need to fill out the information!');
+                    } else {
+                        newPriorBlock.className = 'priority px-2 py-0.5 text-xs font-medium rounded-full'
+                        newPriorBlock.textContent = newPriorValue;
+                        newTypeBlock.className = 'type px-2 py-0.5 text-xs font-medium rounded-full';
+                        newTypeBlock.textContent = newTypeValue;
 
-                    // Thay thế input bằng heading
-                    taskItem.replaceChild(newTextTask, newInputField);
-                    saveTaskButton.classList.add('hidden');
-                    adjustTaskButton.classList.remove('hidden');
+
+                        _this.updateNewInfo(taskId, newValue, newPriorValue, newTypeValue);
+                        _this.renderLists();
+
+                        // Thay thế input bằng heading
+
+                        taskItem.replaceChild(newTextTask, newInputField);
+                        infoBlock.replaceChild(newPriorBlock, newPriorField);
+                        infoBlock.replaceChild(newTypeBlock, newTypeField);
+                        saveTaskButton.classList.add('hidden');
+                        adjustTaskButton.classList.remove('hidden');
+                    }
                 }
             });
         })
     },
 
-    updateNewInfo: function(taskId, newName) {
+    updateNewInfo: function(taskId, newName, newPrior, newType) {
         let updatedTodos = todos.map(todo => {
             if (todo.id == taskId + 1) {
                 todo.name = newName;
+                todo.priority = `${newPrior} Priority`;
+                todo.type = newType;
             }
             return todo;
         });
@@ -239,7 +332,6 @@ const app = {
 
     loadConfig: function() {
         let darkMode = JSON.parse(this.config.isDark);
-        console.log(darkMode);
         if (darkMode) {
             this.isDark = true;
             darkButton.classList.add('fill-white');
@@ -262,6 +354,9 @@ const app = {
 
         // Render các task hiện có
         this.renderLists();
+
+        // Xử lý thời gian task
+        this.checkDateAndRender();
 
         // Load trạng thái người dùng
         this.loadConfig();
