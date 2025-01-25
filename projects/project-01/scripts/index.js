@@ -74,6 +74,8 @@ const app = {
         this.checkPriority();
 
         this.checkType();
+
+        this.checkDateAndRender();
     },
 
     // Hàm để xử lý màu hiển thị của Priority trên giao diện
@@ -121,9 +123,8 @@ const app = {
         const currentTime = new Date();
         const currentMs = currentTime.getTime();
         // Lấy các giá trị thời gian từ Local Storage
-        const deadlineList = todos.map(todo => {
-            return todo.deadline;
-        })
+        const deadlineList = todos.map(todo => todo.originalDeadline);
+
         // Chuyển đổi các giá trị thời gian về 0
         function setMidnight(time) {
             const date = new Date(time);
@@ -133,6 +134,8 @@ const app = {
         
         const currentMidnight = setMidnight(currentMs);
         const formattedDeadline = deadlineList.map(time => setMidnight(new Date(time).getTime()));
+
+        console.log(formattedDeadline);
 
         formattedDeadline.forEach((time, index) => {
             const dayDiff = Math.floor((time - currentMidnight) / oneDayTime);
@@ -146,10 +149,17 @@ const app = {
             if (newDeadline) {
                 todos[index].deadline = `Due ${newDeadline}`;
                 localStorage.setItem('todos', JSON.stringify(todos));
+            } else {
+                const deadlineTime = new Date(time);
+                const deadlineDay = deadlineTime.getDate();
+                const deadlineMonth = deadlineTime.getMonth() + 1;
+                const deadlineYear = deadlineTime.getFullYear();
+                const fullTime = `${deadlineDay}-${deadlineMonth}-${deadlineYear}`;
+                todos[index].deadline = `Due ${fullTime}`;
+                localStorage.setItem('todos', JSON.stringify(todos));
             }
         })
 
-        this.renderLists();
     },
 
     // Tạo thuộc tính viết hoa chữ cái đầu cho đối tượng String
@@ -198,18 +208,19 @@ const app = {
                     todos.push({
                         id: todos.length + 1,
                         name: inputValue.value,
-                        deadline: `Due ${dateInput.value}`,
+                        originalDeadline: dateInput.value,
+                        deadline: `${dateInput.value}`,
                         priority: `${priorValue.value.capitalize()} Priority`,
                         type: `${typeValue.value.capitalize()}`
                     })
                     localStorage.setItem('todos', JSON.stringify(todos));
                     inputValue.value = '';
-                    _this.checkDateAndRender();    
+                    _this.checkDateAndRender();
+                    _this.renderLists();
                 }
             })
 
             
-
             // Sửa/xóa task
             listBlock.addEventListener('click', function(e) {
                 const taskElement = e.target.closest('div[id^="task-"]');
@@ -260,7 +271,7 @@ const app = {
                     if (document.activeElement) {
                         document.activeElement.blur();
                     }
-                    
+
                     // Thay thế nội dung bằng input
                     taskItem.replaceChild(inputField, taskText);
                     infoBlock.replaceChild(selectPriorField, taskPrior);
@@ -268,8 +279,8 @@ const app = {
                     inputField.focus(); // Thêm focus vào input sửa task
                     saveTaskButton.classList.remove('hidden');
                     adjustTaskButton.classList.add('hidden');
-                } else if (e.target.closest('#saveTaskBtn')) {
 
+                } else if (e.target.closest('#saveTaskBtn')) {
                     // Tạo ra các biến chứa giá trị mới
                     let newInputField = taskElement.querySelector('input[type="text"]');
                     let taskItem = newInputField.parentElement;
@@ -303,7 +314,6 @@ const app = {
 
                         _this.updateNewInfo(taskId, newValue, newPriorValue, newTypeValue);
                         _this.renderLists();
-
                         // Thay thế input bằng heading
 
                         taskItem.replaceChild(newTextTask, newInputField);
@@ -354,9 +364,6 @@ const app = {
 
         // Render các task hiện có
         this.renderLists();
-
-        // Xử lý thời gian task
-        this.checkDateAndRender();
 
         // Load trạng thái người dùng
         this.loadConfig();
