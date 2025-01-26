@@ -3,6 +3,7 @@ const menuBlock = document.querySelector('#menu');
 const darkButton = document.querySelector('#darkButton');
 const darkIcon = document.querySelector('#darkIcon');
 const htmlElement = document.documentElement;
+const navBlock = document.querySelector('#navbar');
 const listBlock = document.querySelector('#list');
 const inputButton = document.querySelector('#inputButton');
 const searchInput = document.querySelector('#searchInput');
@@ -35,7 +36,7 @@ const app = {
                 <div id="task-${index + 1}" class="bg-white dark:bg-slate-800 dark:border-gray-500 border-2 border-gray-200 rounded-lg p-4 hover:shadow-md transition-all">
                     <div class="flex items-center justify-between ">
                         <div class="flex space-x-4 items-center">
-                            <input type="checkbox" name="" id="" class="size-5">
+                            <input type="checkbox" name="checkbox" id="" class="size-5">
                             <div id="item-info">
                                 <h3 id="todoName-${index + 1}" class="dark:text-white text-sm font-medium text-gray-900">${todo.name}</h3>
                                 <div id="info-${index + 1}" class="flex items-center space-x-2 mt-1">
@@ -72,12 +73,12 @@ const app = {
         listBlock.innerHTML = htmls;
 
         // Xử lý các loại thời gian, priority và type
-        if (todoList == todos) {
         this.checkPriority();
         
         this.checkType();
         
-        this.checkDateAndRender();
+        if (todoList == todos) {
+            this.checkDateAndRender();
         }
 },
 
@@ -184,7 +185,6 @@ const app = {
         // Gán lại vào local storage và đảm bảo nếu như đúng tuần tự thì không gán nữa
         if (JSON.stringify(updatedDeadlineTodos) !== JSON.stringify(todos)) {
             localStorage.setItem('todos', JSON.stringify(updatedDeadlineTodos));
-            localStorage.setItem('updatedTodos', JSON.stringify(updatedDeadlineTodos));
             this.renderLists(updatedDeadlineTodos);
         }
     },
@@ -207,7 +207,7 @@ const app = {
         const priorValue = document.getElementById('taskPriority');
         const typeValue = document.getElementById('taskType');
         document.addEventListener('DOMContentLoaded', function() {
-            
+            const listItems = Array.from(listBlock.children);
             // Bật/Tắt Dark Mode
             darkButton.addEventListener('click', function() {
                 _this.isDark = !_this.isDark;
@@ -217,11 +217,39 @@ const app = {
                 htmlElement.classList.toggle('dark', _this.isDark);
             })
 
+            // Hiển thị tag theo category
+            navBlock.addEventListener('click', function(e) {
+                switch (e.target.id) {
+                    case 'alltask':
+                        listItems.forEach(item => {
+                            item.style.display = 'block';
+                        });
+                        break;
+                    case 'personal':
+                        listItems.forEach(item => {
+                            const itemType = item.querySelector('.type').textContent.toLowerCase();
+                            item.style.display = itemType.includes(e.target.id) ? 'block' : 'none';
+                        });
+                        break;
+                    case 'work':
+                        listItems.forEach(item => {
+                            const itemType = item.querySelector('.type').textContent.toLowerCase();
+                            item.style.display = itemType.includes(e.target.id) ? 'block' : 'none';
+                        });
+                        break;
+                    case 'shopping':
+                        listItems.forEach(item => {
+                            const itemType = item.querySelector('.type').textContent.toLowerCase();
+                            item.style.display = itemType.includes(e.target.id) ? 'block' : 'none';
+                        });
+                        break;
+                };
+            });
+
             // Tìm task
             headerBlock.addEventListener('input', function(e) {
                 if(e.target.id === 'searchInput') {
                     let searchValue = searchInput.value.toLowerCase().trim();
-                    const listItems = Array.from(listBlock.children);
                     listItems.forEach(item => {
                         const todoName = item.querySelector('h3').textContent.toLowerCase();
                         item.style.display = todoName.includes(searchValue) ? 'block' : 'none';
@@ -242,9 +270,8 @@ const app = {
                     })
                     localStorage.setItem('todos', JSON.stringify(todos));
                     inputValue.value = '';
+                    _this.checkDateAndRender();
                     _this.renderLists();
-                    _this.checkPriority();
-                    _this.checkType();
                 }
             })
 
@@ -265,8 +292,6 @@ const app = {
                     todos.splice(taskId, 1);
                     localStorage.setItem('todos', JSON.stringify(todos));
                     _this.renderLists();
-                    _this.checkPriority();
-                    _this.checkType();
                 }
 
                 // Nếu ấn nút chỉnh sửa task
@@ -344,8 +369,6 @@ const app = {
 
                         _this.updateNewInfo(taskId, newValue, newPriorValue, newTypeValue);
                         _this.renderLists();
-                        _this.checkPriority();
-                        _this.checkType();
                         // Thay thế input bằng heading
 
                         taskItem.replaceChild(newTextTask, newInputField);
