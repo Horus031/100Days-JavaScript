@@ -21,6 +21,7 @@ function toggleMenu() {
 
 // Object app dùng để chứa tất cả các thuộc tính và function 
 const app = {
+    isSorted: false,
     isDark: false,
     config: JSON.parse(localStorage.getItem(userKey)) || {},
     setConfig: function(key, value) {
@@ -28,8 +29,8 @@ const app = {
         localStorage.setItem(userKey, JSON.stringify(this.config));
     },
     // Hàm dùng để render giao diện và check các điều kiện hiển thị
-    renderLists: function() {
-        const htmls = todos.map((todo, index) => {
+    renderLists: function(todoList = todos) {
+        const htmls = todoList.map((todo, index) => {
             return `
                 <div id="task-${index + 1}" class="bg-white dark:bg-slate-800 dark:border-gray-500 border-2 border-gray-200 rounded-lg p-4 hover:shadow-md transition-all">
                     <div class="flex items-center justify-between ">
@@ -71,12 +72,14 @@ const app = {
         listBlock.innerHTML = htmls;
 
         // Xử lý các loại thời gian, priority và type
+        if (todoList == todos) {
         this.checkPriority();
-
+        
         this.checkType();
-
+        
         this.checkDateAndRender();
-    },
+        }
+},
 
     // Hàm để xử lý màu hiển thị của Priority trên giao diện
     checkPriority: function() {
@@ -125,6 +128,7 @@ const app = {
         // Lấy các giá trị thời gian từ Local Storage
         const deadlineList = todos.map(todo => todo.originalDeadline);
 
+
         // Chuyển đổi các giá trị thời gian về 0
         function setMidnight(time) {
             const date = new Date(time);
@@ -134,8 +138,6 @@ const app = {
         
         const currentMidnight = setMidnight(currentMs);
         const formattedDeadline = deadlineList.map(time => setMidnight(new Date(time).getTime()));
-
-        console.log(formattedDeadline);
 
         formattedDeadline.forEach((time, index) => {
             const dayDiff = Math.floor((time - currentMidnight) / oneDayTime);
@@ -149,6 +151,7 @@ const app = {
             if (newDeadline) {
                 todos[index].deadline = `Due ${newDeadline}`;
                 localStorage.setItem('todos', JSON.stringify(todos));
+                
             } else {
                 const deadlineTime = new Date(time);
                 const deadlineDay = deadlineTime.getDate();
@@ -160,6 +163,30 @@ const app = {
             }
         })
 
+        // Khởi tạo biến chứa chuỗi chuyển về định dạng Date
+        const storedDeadlineTime = deadlineList.map(time => {
+            const deadlineTime = new Date(time);
+            return deadlineTime.getTime();
+        });
+        // Khởi tạo biến lặp qua các
+        const sortedDeadlineTodos = todos.toSorted((a, b) => {
+            const deadlineA = storedDeadlineTime[todos.indexOf(a)];
+            const deadlineB = storedDeadlineTime[todos.indexOf(b)];
+            return deadlineA - deadlineB;
+        });
+        // Cập nhật lại id theo tuần tự bắt đầu từ 1
+        const updatedDeadlineTodos = sortedDeadlineTodos.map((todo, i) => {
+            const newTodo = { ...todo };
+            newTodo.id = i + 1;
+            return newTodo;
+        });
+
+        // Gán lại vào local storage và đảm bảo nếu như đúng tuần tự thì không gán nữa
+        if (JSON.stringify(updatedDeadlineTodos) !== JSON.stringify(todos)) {
+            localStorage.setItem('todos', JSON.stringify(updatedDeadlineTodos));
+            localStorage.setItem('updatedTodos', JSON.stringify(updatedDeadlineTodos));
+            this.renderLists(updatedDeadlineTodos);
+        }
     },
 
     // Tạo thuộc tính viết hoa chữ cái đầu cho đối tượng String
@@ -215,8 +242,9 @@ const app = {
                     })
                     localStorage.setItem('todos', JSON.stringify(todos));
                     inputValue.value = '';
-                    _this.checkDateAndRender();
                     _this.renderLists();
+                    _this.checkPriority();
+                    _this.checkType();
                 }
             })
 
@@ -237,6 +265,8 @@ const app = {
                     todos.splice(taskId, 1);
                     localStorage.setItem('todos', JSON.stringify(todos));
                     _this.renderLists();
+                    _this.checkPriority();
+                    _this.checkType();
                 }
 
                 // Nếu ấn nút chỉnh sửa task
@@ -314,6 +344,8 @@ const app = {
 
                         _this.updateNewInfo(taskId, newValue, newPriorValue, newTypeValue);
                         _this.renderLists();
+                        _this.checkPriority();
+                        _this.checkType();
                         // Thay thế input bằng heading
 
                         taskItem.replaceChild(newTextTask, newInputField);
@@ -355,7 +387,6 @@ const app = {
     },
 
     start: function() {
-
         // Tạo thuộc tính (viết hoa chữ đầu tiên)
         this.defineProperties();
 
