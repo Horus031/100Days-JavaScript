@@ -766,6 +766,30 @@ video {
   animation: menuTransition 0.8s ease;
 }
 
+@keyframes slideIn {
+  0% {
+    transform: translateY(-50%);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.animate-taskTransition {
+  animation: slideIn 0.5s ease, fadeIn 0.5s ease forwards;
+}
+
 .flex-col {
   flex-direction: column;
 }

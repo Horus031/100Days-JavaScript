@@ -22,7 +22,6 @@ function toggleMenu() {
 
 // Object app dùng để chứa tất cả các thuộc tính và function 
 const app = {
-    isSorted: false,
     isDark: false,
     config: JSON.parse(localStorage.getItem(userKey)) || {},
     setConfig: function(key, value) {
@@ -33,7 +32,7 @@ const app = {
     renderLists: function(todoList = todos) {
         const htmls = todoList.map((todo, index) => {
             return `
-                <div id="task-${index + 1}" class="bg-white dark:bg-slate-800 dark:border-gray-500 border-2 border-gray-200 rounded-lg p-4 hover:shadow-md transition-all">
+                <div id="task-${index + 1}" class="bg-white dark:bg-slate-800 dark:border-gray-500 border-2 border-gray-200 rounded-lg p-4 hover:shadow-md animate-taskTransition transition-all">
                     <div class="flex items-center justify-between ">
                         <div class="flex space-x-4 items-center">
                             <input type="checkbox" name="checkbox" id="" class="size-5">
@@ -80,6 +79,7 @@ const app = {
         if (todoList == todos) {
             this.checkDateAndRender();
         }
+
 },
 
     // Hàm để xử lý màu hiển thị của Priority trên giao diện
@@ -217,35 +217,6 @@ const app = {
                 htmlElement.classList.toggle('dark', _this.isDark);
             })
 
-            // Hiển thị tag theo category
-            navBlock.addEventListener('click', function(e) {
-                switch (e.target.id) {
-                    case 'alltask':
-                        listItems.forEach(item => {
-                            item.style.display = 'block';
-                        });
-                        break;
-                    case 'personal':
-                        listItems.forEach(item => {
-                            const itemType = item.querySelector('.type').textContent.toLowerCase();
-                            item.style.display = itemType.includes(e.target.id) ? 'block' : 'none';
-                        });
-                        break;
-                    case 'work':
-                        listItems.forEach(item => {
-                            const itemType = item.querySelector('.type').textContent.toLowerCase();
-                            item.style.display = itemType.includes(e.target.id) ? 'block' : 'none';
-                        });
-                        break;
-                    case 'shopping':
-                        listItems.forEach(item => {
-                            const itemType = item.querySelector('.type').textContent.toLowerCase();
-                            item.style.display = itemType.includes(e.target.id) ? 'block' : 'none';
-                        });
-                        break;
-                };
-            });
-
             // Tìm task
             headerBlock.addEventListener('input', function(e) {
                 if(e.target.id === 'searchInput') {
@@ -272,6 +243,7 @@ const app = {
                     inputValue.value = '';
                     _this.checkDateAndRender();
                     _this.renderLists();
+                    _this.attachEvents();
                 }
             })
 
@@ -292,6 +264,7 @@ const app = {
                     todos.splice(taskId, 1);
                     localStorage.setItem('todos', JSON.stringify(todos));
                     _this.renderLists();
+                    _this.attachEvents();
                 }
 
                 // Nếu ấn nút chỉnh sửa task
@@ -304,6 +277,7 @@ const app = {
                     // Tạo ra ô input
                     let inputField = document.createElement('input');
                     inputField.type = 'text';
+                    inputField.name = 'inputValue';
                     inputField.className = 'border border-gray-300 rounded-lg p-1 pl-2 text-gray-300 bg-transparent'
                     inputField.value = currentText;
 
@@ -369,6 +343,7 @@ const app = {
 
                         _this.updateNewInfo(taskId, newValue, newPriorValue, newTypeValue);
                         _this.renderLists();
+                        _this.attachEvents();
                         // Thay thế input bằng heading
 
                         taskItem.replaceChild(newTextTask, newInputField);
@@ -380,6 +355,34 @@ const app = {
                 }
             });
         })
+    },
+
+    attachEvents: function() {
+        const listItems = Array.from(listBlock.children);
+        navBlock.addEventListener('click', function(e) {
+            listItems.forEach(item => {
+                item.classList.remove('animate-taskTransition');
+            });
+            setTimeout(() => {
+                switch (e.target.id) {
+                    case 'alltask':
+                        listItems.forEach(item => {
+                            item.style.display = 'block';
+                            setTimeout(() => item.classList.add('animate-taskTransition'), 0);
+                        });
+                        break;
+                    case 'personal':
+                    case 'work':
+                    case 'shopping':
+                        listItems.forEach(item => {
+                            const itemType = item.querySelector('.type').textContent.toLowerCase();
+                            item.style.display = itemType.includes(e.target.id) ? '' : 'none';
+                            setTimeout(() => item.classList.add('animate-taskTransition'), 0);
+                        });
+                        break;
+                }
+            }, 0);
+        });
     },
 
     updateNewInfo: function(taskId, newName, newPrior, newType) {
@@ -413,11 +416,12 @@ const app = {
         // Tạo thuộc tính (viết hoa chữ đầu tiên)
         this.defineProperties();
 
-        // Xử lý các xử kiện
         this.handleEvents();
 
         // Render các task hiện có
         this.renderLists();
+
+        this.attachEvents();
 
         // Load trạng thái người dùng
         this.loadConfig();

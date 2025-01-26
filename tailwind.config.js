@@ -17,6 +17,14 @@ module.exports = {
           '0%': { opacity: 1 },
           '100%': { opacity: 0 },
         },
+        fadeIn: {
+          '0%': { opacity: 0 },
+          '100%': { opacity: 1},
+        },
+        slideIn: {
+          '0%': { transform: 'translateY(-50%)'},
+          '100%': { transform: 'translateY(0)'},
+        },
         translateTop: {
           '0%' : { transform: 'translateY(0)' },
           '100%': { transform: 'translateY(-100px)'}
@@ -30,6 +38,7 @@ module.exports = {
         wiggle: 'wiggle 1s ease-in-out infinite',
         fadeSequence: 'translateTop 0.5s ease, fadeOut 0.5s ease forwards',
         menuTransition: 'menuTransition 0.8s ease',
+        taskTransition: 'slideIn 0.5s ease, fadeIn 0.5s ease forwards',
       },
       
     },
