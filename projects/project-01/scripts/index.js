@@ -39,9 +39,9 @@ const app = {
                             <div id="item-info">
                                 <h3 id="todoName-${index + 1}" class="dark:text-white text-sm font-medium text-gray-900">${todo.name}</h3>
                                 <div id="info-${index + 1}" class="flex items-center space-x-2 mt-1">
-                                    <span class="deadline dark:text-gray-400 text-xs text-gray-500">${todo.deadline}</span>
+                                    <span class="deadline max-w-[31px] dark:text-gray-400 text-xs text-gray-500 md:w-full md:max-w-max">${todo.deadline}</span>
                                     <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
-                                    <span class="priority px-2 py-0.5 text-xs font-medium rounded-full">${todo.priority}</span>
+                                    <span class="priority text-nowrap px-2 py-0.5 text-xs font-medium rounded-full">${todo.priority}</span>
                                     <span class="type px-2 py-0.5 text-xs font-medium rounded-full">${todo.type}</span>
                                 </div>
                             </div>
@@ -199,15 +199,74 @@ const app = {
         });
     },
 
+    // Tạo Toast Message
+    createToastMessage: function() {
+        const toast = document.querySelector('#toast');
+        const existingMessageBlock = document.querySelector('#message-block');
+        // Add các phần tử DOM vào
+        if (!existingMessageBlock) {
+            const messageBlock = document.createElement('div');
+            messageBlock.id = 'message-block';
+            messageBlock.className = 'active bg-gray-200 flex items-center justify-between z-10 border-blue-700 border-l-4 rounded px-4 py-2 max-w-80 w-80 text-black dark:text-gray-600 animate-toastTransition';
+            messageBlock.innerHTML = `
+                Wait! You need to fill in all the information to add a task.
+                <button id="closeToastBtn" class="ml-2">
+                    <svg class="w-5 h-5 dark:fill-gray-600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 16 16" version="1.1">
+                        <rect width="16" height="16" id="icon-bound" fill="none" />
+                        <polygon points="14.707,2.707 13.293,1.293 8,6.586 2.707,1.293 1.293,2.707 6.586,8 1.293,13.293 2.707,14.707 8,9.414   13.293,14.707 14.707,13.293 9.414,8 "/>
+                    </svg>
+                </button>
+            `
+
+            toast.appendChild(messageBlock);
+
+            const closeToastButton = document.querySelector('#closeToastBtn');
+            let autoRemoveTimeout;
+
+            closeToastButton.addEventListener('click', function() {
+                clearTimeout(autoRemoveTimeout);
+                messageBlock.classList.remove('active');
+                messageBlock.classList.remove('animate-toastTransition');
+                messageBlock.classList.add('animate-toastSlideOut');
+                setTimeout(() => {
+                    toast.removeChild(messageBlock);
+                }, 400);
+            })
+
+            autoRemoveTimeout = setTimeout(() => {
+                // Kiểm tra xem messageBlock có bị xóa trước thời gian này không
+                // Nếu không thì nhảy vào điều kiện và tự động xóa
+                if (toast.contains(messageBlock)) {
+                    // Xóa animation xuất hiện, thêm animation biến mất
+                    messageBlock.classList.remove('animate-toastTransition');
+                    messageBlock.classList.add('animate-toastSlideOut');
+                    // Sau khi thực thi xong animation thì xóa phần tử con
+                    setTimeout(() => {
+                        toast.removeChild(messageBlock);
+                    }, 1000);
+                }
+            }, 3000);
+        }
+        
+        
+        
+
+        
+
+        
+    },
+    
+
     // Hàm để xử lý tất cả sự kiện trên trình duyệt
     handleEvents: function() {
         const _this = this;
         const inputValue = document.getElementById('taskInput');
-        const dateInput = document.getElementById('dateInput')
+        const dateInput = document.getElementById('dateInput');
         const priorValue = document.getElementById('taskPriority');
         const typeValue = document.getElementById('taskType');
         document.addEventListener('DOMContentLoaded', function() {
             const listItems = Array.from(listBlock.children);
+
             // Bật/Tắt Dark Mode
             darkButton.addEventListener('click', function() {
                 _this.isDark = !_this.isDark;
@@ -217,20 +276,10 @@ const app = {
                 htmlElement.classList.toggle('dark', _this.isDark);
             })
 
-            // Tìm task
-            headerBlock.addEventListener('input', function(e) {
-                if(e.target.id === 'searchInput') {
-                    let searchValue = searchInput.value.toLowerCase().trim();
-                    listItems.forEach(item => {
-                        const todoName = item.querySelector('h3').textContent.toLowerCase();
-                        item.style.display = todoName.includes(searchValue) ? 'block' : 'none';
-                    });
-                }
-            })
-
             // Thêm task
             inputButton.addEventListener('click', function() {
-                if (inputValue.value.trim() !== '') {
+                const addCondition = inputValue.value.trim() !== '' && dateInput.value && priorValue.value && typeValue.value
+                if (addCondition) {
                     todos.push({
                         id: todos.length + 1,
                         name: inputValue.value,
@@ -244,6 +293,8 @@ const app = {
                     _this.checkDateAndRender();
                     _this.renderLists();
                     _this.attachEvents();
+                } else {
+                    _this.createToastMessage();
                 }
             })
 
@@ -329,17 +380,16 @@ const app = {
                     // Cấu hình cho thẻ title mới
                     newTextTask.id = `todoName-${taskId + 1}`;
                     newTextTask.className = 'dark:text-white text-sm font-medium text-gray-900';
-                    newTextTask.textContent = newValue;
+                    
 
                     // Cấu hình cho các thẻ select mới
-                    if (newPriorValue == '' || newTypeValue == '') {
-                        alert('You need to fill out the information!');
-                    } else {
+                    const adjustAdditions = newValue.trim() && newPriorValue && newTypeValue
+                    if (adjustAdditions) {
+                        newTextTask.textContent = newValue;
                         newPriorBlock.className = 'priority px-2 py-0.5 text-xs font-medium rounded-full'
                         newPriorBlock.textContent = newPriorValue;
                         newTypeBlock.className = 'type px-2 py-0.5 text-xs font-medium rounded-full';
                         newTypeBlock.textContent = newTypeValue;
-
 
                         _this.updateNewInfo(taskId, newValue, newPriorValue, newTypeValue);
                         _this.renderLists();
@@ -351,6 +401,8 @@ const app = {
                         infoBlock.replaceChild(newTypeBlock, newTypeField);
                         saveTaskButton.classList.add('hidden');
                         adjustTaskButton.classList.remove('hidden');
+                    } else {
+                        _this.createToastMessage();
                     }
                 }
             });
@@ -383,6 +435,17 @@ const app = {
                 }
             }, 0);
         });
+
+        // Tìm task
+        headerBlock.addEventListener('input', function(e) {
+            if(e.target.id === 'searchInput') {
+                let searchValue = searchInput.value.toLowerCase().trim();
+                listItems.forEach(item => {
+                    const todoName = item.querySelector('h3').textContent.toLowerCase();
+                    item.style.display = todoName.includes(searchValue) ? 'block' : 'none';
+                });
+            }
+        })
     },
 
     updateNewInfo: function(taskId, newName, newPrior, newType) {

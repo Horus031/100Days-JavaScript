@@ -32,6 +32,10 @@ module.exports = {
         menuTransition: {
           '0%': { transform: 'translateX(-100%)'},
           '100%': { transform: 'translateX(0)'}
+        },
+        toastSlideOut: {
+          '0%': { transform: 'translateX(0)'},
+          '100%': { transform: 'translateX(-100%)'}
         }
       },
       animation: {
@@ -39,6 +43,8 @@ module.exports = {
         fadeSequence: 'translateTop 0.5s ease, fadeOut 0.5s ease forwards',
         menuTransition: 'menuTransition 0.8s ease',
         taskTransition: 'slideIn 0.5s ease, fadeIn 0.5s ease forwards',
+        toastTransition: 'menuTransition 0.8s ease, fadeIn 0.5s ease forwards',
+        toastSlideOut: 'toastSlideOut 0.8s ease, fadeOut 0.5s ease forwards',
       },
       
     },
