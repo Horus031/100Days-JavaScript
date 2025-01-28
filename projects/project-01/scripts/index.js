@@ -405,111 +405,114 @@ const app = {
             
             // Sửa/xóa task
             listBlock.addEventListener('click', async function(e) {
-                const taskElement = e.target.closest('div[id^="task-"]');
-                const taskId = parseInt(taskElement.id.replace('task-', ''), 10) - 1;
-                const saveTaskButton = taskElement.querySelector('#saveTaskBtn');
-                const adjustTaskButton = taskElement.querySelector('#adjustTaskBtn');
-                let taskText = taskElement.querySelector('h3[id^="todoName-"]');
-                let infoBlock = taskElement.querySelector('div[id^="info-"]')
-                let taskPrior = taskElement.querySelector('.priority');
-                let taskType = taskElement.querySelector('.type');
-
-                // Nếu ấn nút xóa task
-                if (e.target.closest('#deleteTaskBtn')) {
-                    const userConfirmed = await _this.createNotification();
-                    if (userConfirmed) {
-                        todos.splice(taskId, 1);
-                        localStorage.setItem('todos', JSON.stringify(todos));
-                        _this.renderLists();
-                        _this.attachEvents();
-                    }
-                }
-
-                // Nếu ấn nút chỉnh sửa task
-                if (e.target.closest('#adjustTaskBtn')) {
-                    // Tìm đến task cần chỉnh sửa
-                    let taskItem = taskText.parentElement;
-                    let currentText = taskText.textContent;
+                if (e.target.closest('div[id^="task-"]')) {
+                    const taskElement = e.target.closest('div[id^="task-"]');
+                    const taskId = parseInt(taskElement.id.replace('task-', ''), 10) - 1;
+                    const saveTaskButton = taskElement.querySelector('#saveTaskBtn');
+                    const adjustTaskButton = taskElement.querySelector('#adjustTaskBtn');
+                    let taskText = taskElement.querySelector('h3[id^="todoName-"]');
+                    let infoBlock = taskElement.querySelector('div[id^="info-"]')
+                    let taskPrior = taskElement.querySelector('.priority');
+                    let taskType = taskElement.querySelector('.type');
 
 
-                    // Tạo ra ô input
-                    let inputField = document.createElement('input');
-                    inputField.type = 'text';
-                    inputField.name = 'inputValue';
-                    inputField.className = 'border border-gray-300 rounded-lg p-1 pl-2 text-gray-300 bg-transparent'
-                    inputField.value = currentText;
-
-                    // Tạo ra ô select priority
-                    const originalPriorSelect = document.getElementById('taskPriority');
-                    const originalTypeSelect = document.getElementById('taskType');
-
-                    let selectPriorField = document.createElement('select');
-                    selectPriorField.id = 'priority';
-                    selectPriorField.className = originalPriorSelect.className;
-                    selectPriorField.innerHTML = originalPriorSelect.innerHTML;
-
-                    // Tạo ra ô select type
-                    let selectTypeField = document.createElement('select');
-                    selectTypeField.id = 'type';
-                    selectTypeField.className = originalTypeSelect.className;
-                    selectTypeField.innerHTML = originalTypeSelect.innerHTML;
-
-                    // Thoát focus của phần tử hiện tại
-                    if (document.activeElement) {
-                        document.activeElement.blur();
+                    // Nếu ấn nút xóa task
+                    if (e.target.closest('#deleteTaskBtn')) {
+                        const userConfirmed = await _this.createNotification();
+                        if (userConfirmed) {
+                            todos.splice(taskId, 1);
+                            localStorage.setItem('todos', JSON.stringify(todos));
+                            _this.renderLists();
+                            _this.attachEvents();
+                        }
                     }
 
-                    // Thay thế nội dung bằng input
-                    taskItem.replaceChild(inputField, taskText);
-                    infoBlock.replaceChild(selectPriorField, taskPrior);
-                    infoBlock.replaceChild(selectTypeField, taskType);
-                    inputField.focus(); // Thêm focus vào input sửa task
-                    saveTaskButton.classList.remove('hidden');
-                    adjustTaskButton.classList.add('hidden');
+                    // Nếu ấn nút chỉnh sửa task
+                    if (e.target.closest('#adjustTaskBtn')) {
+                        // Tìm đến task cần chỉnh sửa
+                        let taskItem = taskText.parentElement;
+                        let currentText = taskText.textContent;
 
-                } else if (e.target.closest('#saveTaskBtn')) {
-                    // Tạo ra các biến chứa giá trị mới
-                    let newInputField = taskElement.querySelector('input[type="text"]');
-                    let taskItem = newInputField.parentElement;
-                    let newValue = newInputField.value;
 
-                    // Tạo ra hai biến chứa các giá trị select mới
-                    let newPriorField = taskElement.querySelector('select[id="priority"]');
-                    let newPriorValue = newPriorField.value.capitalize();
-                    let newTypeField = taskElement.querySelector('select[id="type"]');
-                    let newTypeValue = newTypeField.value.capitalize();
+                        // Tạo ra ô input
+                        let inputField = document.createElement('input');
+                        inputField.type = 'text';
+                        inputField.name = 'inputValue';
+                        inputField.className = 'border border-gray-300 rounded-lg p-1 pl-2 text-gray-300 bg-transparent'
+                        inputField.value = currentText;
 
-                    // Tạo ra heading chứa thông tin sau khi sửa
-                    let newTextTask = document.createElement('h3');
-                    let newPriorBlock = document.createElement('span');
-                    let newTypeBlock = document.createElement('span');
+                        // Tạo ra ô select priority
+                        const originalPriorSelect = document.getElementById('taskPriority');
+                        const originalTypeSelect = document.getElementById('taskType');
 
-                    // Cấu hình cho thẻ title mới
-                    newTextTask.id = `todoName-${taskId + 1}`;
-                    newTextTask.className = 'dark:text-white text-sm font-medium text-gray-900';
-                    
+                        let selectPriorField = document.createElement('select');
+                        selectPriorField.id = 'priority';
+                        selectPriorField.className = originalPriorSelect.className;
+                        selectPriorField.innerHTML = originalPriorSelect.innerHTML;
 
-                    // Cấu hình cho các thẻ select mới
-                    const adjustAdditions = newValue.trim() && newPriorValue && newTypeValue
-                    if (adjustAdditions) {
-                        newTextTask.textContent = newValue;
-                        newPriorBlock.className = 'priority px-2 py-0.5 text-xs font-medium rounded-full'
-                        newPriorBlock.textContent = newPriorValue;
-                        newTypeBlock.className = 'type px-2 py-0.5 text-xs font-medium rounded-full';
-                        newTypeBlock.textContent = newTypeValue;
+                        // Tạo ra ô select type
+                        let selectTypeField = document.createElement('select');
+                        selectTypeField.id = 'type';
+                        selectTypeField.className = originalTypeSelect.className;
+                        selectTypeField.innerHTML = originalTypeSelect.innerHTML;
 
-                        _this.updateNewInfo(taskId, newValue, newPriorValue, newTypeValue);
-                        _this.renderLists();
-                        _this.attachEvents();
-                        // Thay thế input bằng heading
+                        // Thoát focus của phần tử hiện tại
+                        if (document.activeElement) {
+                            document.activeElement.blur();
+                        }
 
-                        taskItem.replaceChild(newTextTask, newInputField);
-                        infoBlock.replaceChild(newPriorBlock, newPriorField);
-                        infoBlock.replaceChild(newTypeBlock, newTypeField);
-                        saveTaskButton.classList.add('hidden');
-                        adjustTaskButton.classList.remove('hidden');
-                    } else {
-                        _this.createToastMessage();
+                        // Thay thế nội dung bằng input
+                        taskItem.replaceChild(inputField, taskText);
+                        infoBlock.replaceChild(selectPriorField, taskPrior);
+                        infoBlock.replaceChild(selectTypeField, taskType);
+                        inputField.focus(); // Thêm focus vào input sửa task
+                        saveTaskButton.classList.remove('hidden');
+                        adjustTaskButton.classList.add('hidden');
+
+                    } else if (e.target.closest('#saveTaskBtn')) {
+                        // Tạo ra các biến chứa giá trị mới
+                        let newInputField = taskElement.querySelector('input[type="text"]');
+                        let taskItem = newInputField.parentElement;
+                        let newValue = newInputField.value;
+
+                        // Tạo ra hai biến chứa các giá trị select mới
+                        let newPriorField = taskElement.querySelector('select[id="priority"]');
+                        let newPriorValue = newPriorField.value.capitalize();
+                        let newTypeField = taskElement.querySelector('select[id="type"]');
+                        let newTypeValue = newTypeField.value.capitalize();
+
+                        // Tạo ra heading chứa thông tin sau khi sửa
+                        let newTextTask = document.createElement('h3');
+                        let newPriorBlock = document.createElement('span');
+                        let newTypeBlock = document.createElement('span');
+
+                        // Cấu hình cho thẻ title mới
+                        newTextTask.id = `todoName-${taskId + 1}`;
+                        newTextTask.className = 'dark:text-white text-sm font-medium text-gray-900';
+                        
+
+                        // Cấu hình cho các thẻ select mới
+                        const adjustAdditions = newValue.trim() && newPriorValue && newTypeValue
+                        if (adjustAdditions) {
+                            newTextTask.textContent = newValue;
+                            newPriorBlock.className = 'priority px-2 py-0.5 text-xs font-medium rounded-full'
+                            newPriorBlock.textContent = newPriorValue;
+                            newTypeBlock.className = 'type px-2 py-0.5 text-xs font-medium rounded-full';
+                            newTypeBlock.textContent = newTypeValue;
+
+                            _this.updateNewInfo(taskId, newValue, newPriorValue, newTypeValue);
+                            _this.renderLists();
+                            _this.attachEvents();
+                            // Thay thế input bằng heading
+
+                            taskItem.replaceChild(newTextTask, newInputField);
+                            infoBlock.replaceChild(newPriorBlock, newPriorField);
+                            infoBlock.replaceChild(newTypeBlock, newTypeField);
+                            saveTaskButton.classList.add('hidden');
+                            adjustTaskButton.classList.remove('hidden');
+                        } else {
+                            _this.createToastMessage();
+                        }
                     }
                 }
             });

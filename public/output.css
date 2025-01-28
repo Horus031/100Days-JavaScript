@@ -1821,12 +1821,20 @@ video {
   fill: #facc15;
 }
 
+.dark\:fill-gray-400:is(.dark *) {
+  fill: #9ca3af;
+}
+
 .dark\:stroke-\[\#4A5059\]:is(.dark *) {
   stroke: #4A5059;
 }
 
 .dark\:stroke-white:is(.dark *) {
   stroke: #fff;
+}
+
+.dark\:stroke-gray-400:is(.dark *) {
+  stroke: #9ca3af;
 }
 
 .dark\:text-gray-200:is(.dark *) {
