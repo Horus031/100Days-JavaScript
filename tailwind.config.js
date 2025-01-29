@@ -33,9 +33,13 @@ module.exports = {
           '0%': { transform: 'translateX(-100%)'},
           '100%': { transform: 'translateX(0)'}
         },
-        toastSlideOut: {
+        SlideOut: {
           '0%': { transform: 'translateX(0)'},
           '100%': { transform: 'translateX(-100%)'}
+        },
+        taskSlideOut: {
+          '0%': { transform: 'translateX(0)'},
+          '100%': { transform: 'translateX(100%)'}
         }
       },
       animation: {
@@ -44,7 +48,8 @@ module.exports = {
         menuTransition: 'menuTransition 0.8s ease',
         taskTransition: 'slideIn 0.5s ease, fadeIn 0.5s ease forwards',
         toastTransition: 'menuTransition 0.8s ease, fadeIn 0.5s ease forwards',
-        toastSlideOut: 'toastSlideOut 0.8s ease, fadeOut 0.5s ease forwards',
+        toastSlideOut: 'SlideOut 0.8s ease, fadeOut 0.5s ease forwards',
+        taskSlideOut: 'taskSlideOut 0.8s ease, fadeOut 0.5s ease forwards',
       },
       
     },

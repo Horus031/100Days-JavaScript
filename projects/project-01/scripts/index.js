@@ -11,6 +11,7 @@ const notification = document.querySelector('#dialog');
 const userKey = 'User';
 // Lấy danh sách từ Local Storage hoặc tạo mảng mới nếu chưa có
 const todos = JSON.parse(localStorage.getItem('todos')) || [];
+let completedTodos = JSON.parse(localStorage.getItem('completedTodos')) || [];
 
 
 // Bật/tắt menu
@@ -37,8 +38,10 @@ const app = {
         } else {
             const fragment = document.createDocumentFragment();
             todoList.forEach((todo, index) => {
-                const taskElement = this.createTaskElement(todo, index);
-                fragment.appendChild(taskElement);
+                if (todo.completed === false) {
+                    const taskElement = this.createTaskElement(todo, index);
+                    fragment.appendChild(taskElement);
+                }
             });
             listBlock.innerHTML = ''; // Xóa nội dung cũ
             listBlock.appendChild(fragment); // Thêm danh sách mới
@@ -306,7 +309,7 @@ const app = {
         }  
     },
     
-    createNotification: function(){ 
+    createNotification: function(taskState){ 
         return new Promise((resolve) => {
             const notification = document.createElement('div');
             notification.classList.add('relative', 'z-10');
@@ -316,30 +319,57 @@ const app = {
             const overlay = document.createElement('div');
             overlay.className = 'fixed inset-0 bg-gray-500/75 transition-opacity';
             overlay.ariaHidden = 'true';
+            const state = {
+                checkTask: `
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start">
+                            <div class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:size-10">
+                                <svg class="size-6 fill-green-600" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 50 50">
+                                    <path d="M 42.875 8.625 C 42.84375 8.632813 42.8125 8.644531 42.78125 8.65625 C 42.519531 8.722656 42.292969 8.890625 42.15625 9.125 L 21.71875 40.8125 L 7.65625 28.125 C 7.410156 27.8125 7 27.675781 6.613281 27.777344 C 6.226563 27.878906 5.941406 28.203125 5.882813 28.597656 C 5.824219 28.992188 6.003906 29.382813 6.34375 29.59375 L 21.25 43.09375 C 21.46875 43.285156 21.761719 43.371094 22.050781 43.328125 C 22.339844 43.285156 22.59375 43.121094 22.75 42.875 L 43.84375 10.1875 C 44.074219 9.859375 44.085938 9.425781 43.875 9.085938 C 43.664063 8.746094 43.269531 8.566406 42.875 8.625 Z"></path>
+                                </svg>
+                            </div>
+                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                <h3 class="text-base font-semibold text-gray-900" id="modal-title">Re-check your action</h3>
+                                <div class="mt-2">
+                                <p class="text-sm text-gray-500">Let's check everything before complete the task. Are you sure you want to complete the task?</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                        <button id="acceptDelete" value="Yes" type="button" class="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-green-500 sm:ml-3 sm:w-auto">Confirm</button>
+                        <button id="cancelDelete" value="No" type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto">Cancel</button>
+                    </div>
+                `,
+                deleteTask: `
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start">
+                            <div class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:size-10">
+                                <svg class="size-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                                </svg>
+                            </div>
+                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                <h3 class="text-base font-semibold text-gray-900" id="modal-title">Delete your task</h3>
+                                <div class="mt-2">
+                                <p class="text-sm text-gray-500">Are you sure you want to delete your task? All of your data will be permanently removed. This action cannot be undone.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                        <button id="acceptDelete" value="Yes" type="button" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-red-500 sm:ml-3 sm:w-auto">Delete</button>
+                        <button id="cancelDelete" value="No" type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto">Cancel</button>
+                    </div>
+                `
+            };
+            
             const infoBlock = document.createElement('div');
             infoBlock.className = 'fixed inset-0 z-10 w-screen overflow-y-auto';
             infoBlock.innerHTML = `
                 <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
                     <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
-                        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                            <div class="sm:flex sm:items-start">
-                                <div class="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:size-10">
-                                    <svg class="size-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-                                    </svg>
-                                </div>
-                                <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                    <h3 class="text-base font-semibold text-gray-900" id="modal-title">Delete your task</h3>
-                                    <div class="mt-2">
-                                    <p class="text-sm text-gray-500">Are you sure you want to delete your task? All of your data will be permanently removed. This action cannot be undone.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                            <button id="acceptDelete" value="Yes" type="button" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-red-500 sm:ml-3 sm:w-auto">Delete</button>
-                            <button id="cancelDelete" value="No" type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto">Cancel</button>
-                        </div>
+                        ${state[taskState]}
                     </div>
                 </div>
             `
@@ -382,18 +412,22 @@ const app = {
             // Thêm task
             inputButton.addEventListener('click', function() {
                 const addCondition = inputValue.value.trim() !== '' && dateInput.value && priorValue.value && typeValue.value
+                const formattedDate = _this.convertDateFormat(dateInput.value);
                 if (addCondition) {
-                    const formattedDate = _this.convertDateFormat(dateInput.value);
                     todos.push({
                         id: todos.length + 1,
                         name: inputValue.value,
                         originalDeadline: formattedDate,
                         deadline: `${formattedDate}`,
                         priority: `${priorValue.value.capitalize()} Priority`,
-                        type: `${typeValue.value.capitalize()}`
+                        type: `${typeValue.value.capitalize()}`,
+                        completed: false,
                     })
                     localStorage.setItem('todos', JSON.stringify(todos));
                     inputValue.value = '';
+                    dateInput.value = '';
+                    priorValue.value = '';
+                    typeValue.value = '';
                     _this.checkDateAndRender();
                     _this.renderLists();
                     _this.attachEvents();
@@ -405,8 +439,9 @@ const app = {
             
             // Sửa/xóa task
             listBlock.addEventListener('click', async function(e) {
+                const taskElement = e.target.closest('div[id^="task-"]');
+                
                 if (e.target.closest('div[id^="task-"]')) {
-                    const taskElement = e.target.closest('div[id^="task-"]');
                     const taskId = parseInt(taskElement.id.replace('task-', ''), 10) - 1;
                     const saveTaskButton = taskElement.querySelector('#saveTaskBtn');
                     const adjustTaskButton = taskElement.querySelector('#adjustTaskBtn');
@@ -418,7 +453,7 @@ const app = {
 
                     // Nếu ấn nút xóa task
                     if (e.target.closest('#deleteTaskBtn')) {
-                        const userConfirmed = await _this.createNotification();
+                        const userConfirmed = await _this.createNotification('deleteTask');
                         if (userConfirmed) {
                             todos.splice(taskId, 1);
                             localStorage.setItem('todos', JSON.stringify(todos));
@@ -500,7 +535,7 @@ const app = {
                             newTypeBlock.className = 'type px-2 py-0.5 text-xs font-medium rounded-full';
                             newTypeBlock.textContent = newTypeValue;
 
-                            _this.updateNewInfo(taskId, newValue, newPriorValue, newTypeValue);
+                            _this.updateSavedInfo(taskId, newValue, newPriorValue, newTypeValue);
                             _this.renderLists();
                             _this.attachEvents();
                             // Thay thế input bằng heading
@@ -515,7 +550,48 @@ const app = {
                         }
                     }
                 }
+
+                if (e.target.closest('input[type=checkbox]')) {
+                    const taskId = parseInt(taskElement.id.replace('task-', ''), 10) - 1;
+                    console.log(taskId);
+                    const checkbox = taskElement.querySelector('input[type=checkbox]');
+
+
+                    const userConfirm = await _this.createNotification('checkTask');
+                    if (userConfirm) {
+                        taskElement.classList.remove('animate-taskTransition');
+                        taskElement.classList.add('animate-taskSlideOut');
+
+                        todos.forEach((todo) => {
+                            if (todo.id === taskId + 1) {
+                                completedTodos.push({
+                                    id: completedTodos.length + 1,
+                                    name: todo.name,
+                                    originalDeadline: todo.originalDeadline,
+                                    deadline: todo.deadline,
+                                    priority: todo.priority,
+                                    type: todo.type,
+                                    completed: true,
+                                })
+                            }
+                            // Xóa task đã được check hoàn thành ở todos
+                            todos.splice(taskId, 1);
+
+                            // Update cả hai local storage
+                            localStorage.setItem('todos', JSON.stringify(todos));
+                            localStorage.setItem('completedTodos', JSON.stringify(completedTodos));
+    
+    
+                            _this.renderLists(todos);
+                        });
+                    } else {
+                        checkbox.checked = false;
+                    }
+                }
             });
+
+            // Check task hoan thanh
+            
         })
     },
 
@@ -644,7 +720,7 @@ const app = {
         })
     },
 
-    updateNewInfo: function(taskId, newName, newPrior, newType) {
+    updateSavedInfo: function(taskId, newName, newPrior, newType) {
         let updatedTodos = todos.map(todo => {
             if (todo.id == taskId + 1) {
                 todo.name = newName;
