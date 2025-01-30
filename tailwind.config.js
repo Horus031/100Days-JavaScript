@@ -49,7 +49,7 @@ module.exports = {
         taskTransition: 'slideIn 0.5s ease, fadeIn 0.5s ease forwards',
         toastTransition: 'menuTransition 0.8s ease, fadeIn 0.5s ease forwards',
         toastSlideOut: 'SlideOut 0.8s ease, fadeOut 0.5s ease forwards',
-        taskSlideOut: 'taskSlideOut 0.8s ease, fadeOut 0.5s ease forwards',
+        taskSlideOut: 'taskSlideOut 0.5s ease, fadeOut 0.5s ease forwards',
       },
       
     },

@@ -8,11 +8,13 @@ const listBlock = document.querySelector('#list');
 const inputButton = document.querySelector('#inputButton');
 const searchInput = document.querySelector('#searchInput');
 const notification = document.querySelector('#dialog');
+const completedList = document.querySelector('#completed-list');
 const userKey = 'User';
 // Lấy danh sách từ Local Storage hoặc tạo mảng mới nếu chưa có
 const todos = JSON.parse(localStorage.getItem('todos')) || [];
 let completedTodos = JSON.parse(localStorage.getItem('completedTodos')) || [];
 
+console.log(completedList.children);
 
 // Bật/tắt menu
 function toggleMenu() {
@@ -38,22 +40,32 @@ const app = {
         } else {
             const fragment = document.createDocumentFragment();
             todoList.forEach((todo, index) => {
-                if (todo.completed === false) {
+                if (todoList == todos) {
                     const taskElement = this.createTaskElement(todo, index);
                     fragment.appendChild(taskElement);
+                } else {
+                    const completedTask = this.createCompletedTask(todo, index);
+                    fragment.appendChild(completedTask);
                 }
             });
-            listBlock.innerHTML = ''; // Xóa nội dung cũ
-            listBlock.appendChild(fragment); // Thêm danh sách mới
+            
+            if (todoList == todos) {
+                listBlock.innerHTML = ''; // Xóa nội dung cũ
+                listBlock.appendChild(fragment); // Thêm danh sách mới
+            } else {
+                completedList.innerHTML = '';
+                completedList.appendChild(fragment);
+            }
 
             // Xử lý các loại thời gian, priority và type
             this.checkPriority();
             
             this.checkType();
             
-            if (todoList == todos) { 
+            if (todoList == todos) {
                 this.checkDateAndRender();
             }
+
         }
     },
 
@@ -130,6 +142,32 @@ const app = {
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                         </svg>
                     </button>
+                </div>
+            </div>
+        `;
+        return taskDiv;
+    },
+
+    createCompletedTask: function(todo, index) {
+        const taskDiv = document.createElement('div');
+        taskDiv.id = `completed-${index + 1}`;
+        taskDiv.className = 'bg-white dark:bg-slate-800 dark:border-gray-500 border-2 border-gray-200 rounded-lg p-4 hover:shadow-md animate-taskTransition transition-all';
+        taskDiv.innerHTML = `
+            <div class="flex items-center justify-between">
+                <div class="flex space-x-4 items-center">
+                    <div>
+                        <svg class="size-6" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 48 48">
+                            <path fill="#c8e6c9" d="M36,42H12c-3.314,0-6-2.686-6-6V12c0-3.314,2.686-6,6-6h24c3.314,0,6,2.686,6,6v24C42,39.314,39.314,42,36,42z"></path><path fill="#4caf50" d="M34.585 14.586L21.014 28.172 15.413 22.584 12.587 25.416 21.019 33.828 37.415 17.414z"></path>
+                        </svg>
+                    </div>
+                    <div id="item-info">
+                        <h3 id="todoName-${index + 1}" class="dark:text-white text-sm font-medium text-gray-900">${todo.name}</h3>
+                        <div id="info-${index + 1}" class="flex items-center space-x-2 mt-1">
+                            <span class="deadline dark:text-gray-400 text-xs text-gray-500">${todo.originalDeadline}</span>
+                            <span class="priority text-nowrap px-2 py-0.5 text-xs font-medium rounded-full">${todo.priority}</span>
+                            <span class="type px-2 py-0.5 text-xs font-medium rounded-full">${todo.type}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
@@ -224,10 +262,8 @@ const app = {
             return deadlineTime.getTime();
         });
         // Khởi tạo biến lặp qua các
-        const sortedDeadlineTodos = todos.toSorted((a, b) => {
-            const deadlineA = storedDeadlineTime[todos.indexOf(a)];
-            const deadlineB = storedDeadlineTime[todos.indexOf(b)];
-            return deadlineA - deadlineB;
+        const sortedDeadlineTodos = [...todos].sort((a, b) => {
+            return new Date(a.originalDeadline) - new Date(b.originalDeadline);
         });
         // Cập nhật lại id theo tuần tự bắt đầu từ 1
         const updatedDeadlineTodos = sortedDeadlineTodos.map((todo, i) => {
@@ -238,9 +274,17 @@ const app = {
 
         // Gán lại vào local storage và đảm bảo nếu như đúng tuần tự thì không gán nữa
         if (JSON.stringify(updatedDeadlineTodos) !== JSON.stringify(todos)) {
-            localStorage.setItem('todos', JSON.stringify(updatedDeadlineTodos));
-            this.renderLists(updatedDeadlineTodos);
+            // Cập nhật lại biến todos để đảm bảo nó chứa danh sách đã sắp xếp
+            todos.length = 0; // Xóa toàn bộ phần tử nhưng giữ reference
+            todos.push(...updatedDeadlineTodos); // Thêm danh sách mới vào
+        
+            // Cập nhật localStorage với danh sách đã sắp xếp
+            localStorage.setItem('todos', JSON.stringify(todos));
+        
+            // Render lại danh sách để cập nhật giao diện
+            this.renderLists();
         }
+        
     },
 
     // Tạo thuộc tính viết hoa chữ cái đầu cho đối tượng String
@@ -398,8 +442,6 @@ const app = {
         const priorValue = document.getElementById('taskPriority');
         const typeValue = document.getElementById('taskType');
         document.addEventListener('DOMContentLoaded', function() {
-            const listItems = Array.from(listBlock.children);
-
             // Bật/Tắt Dark Mode
             darkButton.addEventListener('click', function() {
                 _this.isDark = !_this.isDark;
@@ -423,14 +465,15 @@ const app = {
                         type: `${typeValue.value.capitalize()}`,
                         completed: false,
                     })
-                    localStorage.setItem('todos', JSON.stringify(todos));
                     inputValue.value = '';
                     dateInput.value = '';
                     priorValue.value = '';
                     typeValue.value = '';
+                    localStorage.setItem('todos', JSON.stringify(todos));
                     _this.checkDateAndRender();
                     _this.renderLists();
                     _this.attachEvents();
+                     // Đợi một chút để cập nhật lại dữ liệu
                 } else {
                     _this.createToastMessage();
                 }
@@ -562,35 +605,50 @@ const app = {
                         taskElement.classList.remove('animate-taskTransition');
                         taskElement.classList.add('animate-taskSlideOut');
 
-                        todos.forEach((todo) => {
-                            if (todo.id === taskId + 1) {
+                        setTimeout(() => {
+                            const taskIndex = todos.findIndex(todo => todo.id === taskId + 1);
+                            if (taskIndex !== -1) {
+                                const todo = todos[taskIndex];
+                
+                                // Add the task to completedTodos
                                 completedTodos.push({
                                     id: completedTodos.length + 1,
                                     name: todo.name,
-                                    originalDeadline: todo.originalDeadline,
+                                    originalDeadline: `Due ${_this.convertDateFormat(todo.originalDeadline)}`,
                                     deadline: todo.deadline,
                                     priority: todo.priority,
                                     type: todo.type,
                                     completed: true,
-                                })
+                                });
+                
+                                // Remove the task from todos
+                                todos.splice(taskIndex, 1);
+                
+                                // Update both local storage
+                                localStorage.setItem('todos', JSON.stringify(todos));
+                                localStorage.setItem('completedTodos', JSON.stringify(completedTodos));
+                
+                                // Optionally, re-render the task list
+                                _this.renderLists(todos);
+                                _this.renderLists(completedTodos);
+                                _this.attachEvents();
                             }
-                            // Xóa task đã được check hoàn thành ở todos
-                            todos.splice(taskId, 1);
-
-                            // Update cả hai local storage
-                            localStorage.setItem('todos', JSON.stringify(todos));
-                            localStorage.setItem('completedTodos', JSON.stringify(completedTodos));
-    
-    
-                            _this.renderLists(todos);
-                        });
+                        }, 400);
                     } else {
                         checkbox.checked = false;
                     }
                 }
             });
 
-            // Check task hoan thanh
+
+            // Mỏ các task đã hoàn thành
+            navBlock.addEventListener('click', function(e) {
+                if (e.target.closest('button[id="completed-task"]')) {
+                    listBlock.classList.add('hidden');
+                    completedList.classList.remove('hidden');
+                }
+            })
+
             
         })
     },
@@ -683,6 +741,7 @@ const app = {
 
     attachEvents: function() {
         const listItems = Array.from(listBlock.children);
+        const completedItems = Array.from(completedList.children);
         navBlock.addEventListener('click', function(e) {
             listItems.forEach(item => {
                 item.classList.remove('animate-taskTransition');
@@ -690,7 +749,10 @@ const app = {
             setTimeout(() => {
                 switch (e.target.id) {
                     case 'alltask':
+                        listBlock.classList.remove('hidden');
+                        completedList.classList.add('hidden');
                         listItems.forEach(item => {
+                            item.classList.remove('hidden');
                             item.style.display = 'block';
                             setTimeout(() => item.classList.add('animate-taskTransition'), 0);
                         });
@@ -698,6 +760,8 @@ const app = {
                     case 'personal':
                     case 'work':
                     case 'shopping':
+                        listBlock.classList.remove('hidden');
+                        completedList.classList.add('hidden');
                         listItems.forEach(item => {
                             const itemType = item.querySelector('.type').textContent.toLowerCase();
                             item.style.display = itemType.includes(e.target.id) ? '' : 'none';
@@ -712,10 +776,28 @@ const app = {
         headerBlock.addEventListener('input', function(e) {
             if(e.target.id === 'searchInput') {
                 let searchValue = searchInput.value.toLowerCase().trim();
-                listItems.forEach(item => {
-                    const todoName = item.querySelector('h3').textContent.toLowerCase();
-                    item.style.display = todoName.includes(searchValue) ? 'block' : 'none';
-                });
+                const listFirstChild = document.querySelector('#task-1');
+                const completedFirstChild = document.querySelector('#completed-1');
+                if (!listBlock.classList.contains('hidden') && listFirstChild) {
+                    console.log(listBlock.children)
+                    listItems.forEach(item => {
+                        const todoName = item.querySelector('h3[id^="todoName-"]').textContent.toLowerCase();
+                        if (todoName.includes(searchValue)) {
+                            item.classList.remove('hidden');
+                        } else {
+                            item.classList.add('hidden');
+                        }
+                    });
+                } else if (!completedList.classList.contains('hidden') && completedFirstChild) {
+                    completedItems.forEach(item => {
+                        const todoName = item.querySelector('h3[id^="todoName-"]').textContent.toLowerCase();
+                        if (todoName.includes(searchValue)) {
+                            item.classList.remove('hidden');
+                        } else {
+                            item.classList.add('hidden');
+                        }
+                    })
+                }
             }
         })
     },
@@ -755,9 +837,11 @@ const app = {
 
         this.handleDatePicker();
 
-        // Render các task hiện có
+        // Render các task hiện có & các task đã hoàn thành
         this.renderLists();
+        this.renderLists(completedTodos);
 
+        // Hàm gán sự kiện khi load & gán lại mỗi khi thay đổi phần tử DOM 
         this.attachEvents();
 
         // Load trạng thái người dùng
