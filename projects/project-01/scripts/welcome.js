@@ -6,7 +6,7 @@ function switchTab() {
     headerBlock.classList.add('animate-fadeSequence');
     mainBlock.classList.add('animate-fadeSequence');
     setTimeout(function() {
-        window.location.href = "/home";
+        window.location.href = "/index.html";
     }, 1000);
 }
 

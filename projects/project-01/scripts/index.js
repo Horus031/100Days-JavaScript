@@ -14,8 +14,6 @@ const userKey = 'User';
 const todos = JSON.parse(localStorage.getItem('todos')) || [];
 let completedTodos = JSON.parse(localStorage.getItem('completedTodos')) || [];
 
-console.log(completedList.children);
-
 // Bật/tắt menu
 function toggleMenu() {
     menuBlock.classList.toggle('hidden');
@@ -667,74 +665,111 @@ const app = {
         const cancelButton = document.getElementById('cancelButton');
         const applyButton = document.getElementById('applyButton');
         const toggleDatepicker = document.getElementById('toggleDatepicker');
-
+    
         let currentDate = new Date();
         let selectedDate = null;
-
+    
         function renderCalendar() {
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
-
+    
             currentMonthElement.textContent = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-
+    
             daysContainer.innerHTML = '';
             const firstDayOfMonth = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
-
+    
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+    
             for (let i = 0; i < firstDayOfMonth; i++) {
-            daysContainer.innerHTML += `<div></div>`;
+                const emptySlot = document.createElement('div');
+                daysContainer.appendChild(emptySlot);
             }
-
+    
             for (let i = 1; i <= daysInMonth; i++) {
-            daysContainer.innerHTML += `<div class="flex items-center justify-center cursor-pointer w-[46px] h-[46px] text-dark-3 dark:text-dark-6 rounded-full hover:bg-blue-700 hover:text-white">${i}</div>`;
+                const date = new Date(year, month, i);
+                const dayElement = document.createElement('div');
+                dayElement.textContent = i;
+                dayElement.classList.add('flex', 'items-center', 'justify-center', 'w-[46px]', 'h-[46px]', 'rounded-full');
+    
+                if (date < today) {
+                    dayElement.classList.add('text-slate-700', 'pointer-events-none');
+                } else {
+                    dayElement.classList.add('cursor-pointer', 'hover:bg-blue-700', 'hover:text-white');
+                }
+                daysContainer.appendChild(dayElement);
             }
-
+    
+            // Xóa bỏ tất cả sự kiện click cũ trước khi gán lại
             document.querySelectorAll('#days-container div').forEach(day => {
-            day.addEventListener('click', function () {
-                selectedDate = `${this.textContent}-${month + 1}-${year}`;
-                document.querySelectorAll('#days-container div').forEach(d => d.classList.remove('bg-blue-700', 'text-white', 'dark:text-white'));
-                this.classList.add('bg-blue-700', 'text-white', 'dark:text-white');
+                day.replaceWith(day.cloneNode(true)); // Xóa hết sự kiện đã gán trước đó
             });
+    
+            document.querySelectorAll('#days-container div').forEach(day => {
+                day.addEventListener('click', function () {
+                    selectedDate = `${this.textContent}-${month + 1}-${year}`;
+                    document.querySelectorAll('#days-container div').forEach(d => d.classList.remove('bg-blue-700', 'text-white', 'dark:text-white'));
+                    this.classList.add('bg-blue-700', 'text-white', 'dark:text-white');
+                });
             });
         }
-
-        datepicker.addEventListener('click', function () {
-            datepickerContainer.classList.toggle('hidden');
-            renderCalendar();
-        });
-
-        toggleDatepicker.addEventListener('click', function () {
-            datepickerContainer.classList.toggle('hidden');
-            renderCalendar();
-        });
-
-        prevMonthButton.addEventListener('click', function () {
-            currentDate.setMonth(currentDate.getMonth() - 1);
-            renderCalendar();
-        });
-
-        nextMonthButton.addEventListener('click', function () {
+    
+        // Xóa sự kiện cũ trước khi gán mới
+        prevMonthButton.removeEventListener('click', handlePrevMonth);
+        nextMonthButton.removeEventListener('click', handleNextMonth);
+    
+        function handleNextMonth() {
+            console.log("Next Month Clicked - Before:", currentDate.getMonth());
+            
+            currentDate.setDate(1); // Đặt về ngày 1 để tránh nhảy tháng ngoài ý muốn
             currentDate.setMonth(currentDate.getMonth() + 1);
+            
+            console.log("Next Month Clicked - After:", currentDate.getMonth());
             renderCalendar();
-        });
-
+        }
+        
+        function handlePrevMonth() {
+            console.log("Prev Month Clicked - Before:", currentDate.getMonth());
+            
+            currentDate.setDate(1); // Đặt về ngày 1 để tránh lỗi nhảy tháng
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            
+            console.log("Prev Month Clicked - After:", currentDate.getMonth());
+            renderCalendar();
+        }
+        
+    
+        prevMonthButton.addEventListener('click', handlePrevMonth);
+        nextMonthButton.addEventListener('click', handleNextMonth);
+    
         cancelButton.addEventListener('click', function () {
             selectedDate = null;
             datepickerContainer.classList.add('hidden');
         });
-
+    
         applyButton.addEventListener('click', function () {
             if (selectedDate) {
-            datepicker.value = selectedDate;
-            console.log(selectedDate.split('-').reverse().join('-'));
+                datepicker.value = selectedDate;
             }
             datepickerContainer.classList.add('hidden');
         });
-
-        // Close datepicker when clicking outside
+    
+        toggleDatepicker.addEventListener('click', function () {
+            datepickerContainer.classList.toggle('hidden');
+            renderCalendar();
+        });
+    
+        datepicker.addEventListener('click', function () {
+            datepickerContainer.classList.toggle('hidden');
+            renderCalendar();
+        });
+    
+        renderCalendar();
+    
         document.addEventListener('click', function (event) {
             if (!datepicker.contains(event.target) && !datepickerContainer.contains(event.target)) {
-            datepickerContainer.classList.add('hidden');
+                datepickerContainer.classList.add('hidden');
             }
         });
     },
