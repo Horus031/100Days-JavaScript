@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    @media screen and (min-width: 768px) {
+        .unset-position {
+            left: unset;
+        }
+    }
+}

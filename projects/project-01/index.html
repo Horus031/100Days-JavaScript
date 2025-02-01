@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>To-Do App</title>
+    <title>Task Master</title>
     <link rel="stylesheet" href="./public/output.css">
+    <link rel="shortcut icon" href="./assets/myLogo.png" type="image/x-icon">
 </head>
 <body class="font-sans h-screen">
-    <div class="relative flex h-full w-full overflow-hidden dark:bg-slate-950">
+    <div class="relative flex h-full w-full dark:bg-slate-950">
         <!-- Menu -->
-        <aside id="menu" class="absolute w-full bg-white -translate-x-full  dark:bg-slate-800 dark:border-gray-500 size-full z-50 border-r border-gray-200  md:flex md:flex-col md:static lg:-translate-x-0 lg:w-64 transition-all">
+        <aside id="menu" class="absolute w-full bg-white -translate-x-full  dark:bg-slate-800 dark:border-gray-500 size-full z-50 border-r border-gray-200  md:flex md:flex-col md:w-64 md:static md:-translate-x-0 transition-all">
             <div class="p-4 flex justify-between">
                 <div class="flex items-center space-x-2">
                     <img src="./assets/todo-img.png" alt="" class="w-8 h-8 rounded">
-                    <h1 class="dark:text-white text-xl font-bold text-gray-800">TodoApp</h1>
+                    <h1 class="dark:text-white text-xl font-bold text-gray-800">Task Master</h1>
                 </div>
                 <button id="closeMenu" class="hover:bg-gray-200 p-2 rounded-md md:hidden transition-all">
                     <svg class="w-5 h-5 dark:fill-white" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 16 16" version="1.1">
@@ -93,7 +94,7 @@
                             </svg>
                         </button>
                         <div class="flex items-center space-x-2">
-                            <img src="./assets/user.jpg" alt="Profile" class="w-8 h-8 rounded-full">
+                            <img src="./assets/myLogo.png" alt="Profile" class="size-10 rounded-full bg-white p-0.5">
                             <span class="dark:text-white text-sm font-medium text-gray-700 w-[50px] line-clamp-1 text-wrap md:w-full">Horus Weaver</span>
                         </div>
                     </div>
@@ -183,7 +184,7 @@
                                 </div>
                                 
                                 <!-- Datepicker Container -->
-                                <div id="datepicker-container" class="absolute mt-2 bg-white dark:bg-slate-900 border dark:border-slate-400 rounded-xl shadow-datepicker pt-5 hidden w-[400px]">
+                                <div id="datepicker-container" class="absolute -left-[36px] md:unset-position md:right-0 mt-2 bg-white dark:bg-slate-900 border dark:border-slate-400 rounded-xl shadow-datepicker pt-5 hidden w-[400px]">
                                     <div class="flex items-center justify-between px-5">
                                         <button id="prevMonth" class="px-2 py-2 text-dark dark:text-white hover:bg-gray-2 dark:hover:bg-dark rounded-md">
                                             <svg class="fill-current" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">

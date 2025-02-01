@@ -807,7 +807,7 @@ const app = {
                         listBlock.classList.remove('hidden');
                         completedList.classList.add('hidden');
                         listItems.forEach(item => {
-                            const itemType = item.querySelector('.type').textContent.toLowerCase();
+                            const itemType = item.querySelector('.type')?.textContent.toLowerCase() || '';
                             item.style.display = itemType.includes(e.target.id) ? '' : 'none';
                             setTimeout(() => item.classList.add('animate-taskTransition'), 0);
                         });
