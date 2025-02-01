@@ -29,7 +29,6 @@ module.exports = {
           '100%': { transform: 'translateY(-100px)'}
         },
         menuTransition: {
-          '0%': { transform: 'translateX(-100%)'},
           '100%': { transform: 'translateX(0)'}
         },
         SlideOut: {
@@ -44,11 +43,12 @@ module.exports = {
       animation: {
         wiggle: 'wiggle 1s ease-in-out infinite',
         fadeSequence: 'translateTop 0.5s ease, fadeOut 0.5s ease forwards',
-        menuTransition: 'menuTransition 0.8s ease',
+        menuTransition: 'menuTransition 0.8s ease forwards',
         taskTransition: 'slideIn 0.5s ease, fadeIn 0.5s ease forwards',
         toastTransition: 'menuTransition 0.8s ease, fadeIn 0.5s ease forwards',
         toastSlideOut: 'SlideOut 0.8s ease, fadeOut 0.5s ease forwards',
         taskSlideOut: 'taskSlideOut 0.5s ease, fadeOut 0.5s ease forwards',
+        slideOut: 'SlideOut 0.5s ease',
       },
       
     },

@@ -774,10 +774,6 @@ video {
   width: 1.5rem;
 }
 
-.w-64 {
-  width: 16rem;
-}
-
 .w-8 {
   width: 2rem;
 }
@@ -831,6 +827,11 @@ video {
   flex-shrink: 0;
 }
 
+.-translate-x-full {
+  --tw-translate-x: -100%;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
 .transform {
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
@@ -876,17 +877,27 @@ video {
 }
 
 @keyframes menuTransition {
-  0% {
-    transform: translateX(-100%);
-  }
-
   100% {
     transform: translateX(0);
   }
 }
 
 .animate-menuTransition {
-  animation: menuTransition 0.8s ease;
+  animation: menuTransition 0.8s ease forwards;
+}
+
+@keyframes SlideOut {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-slideOut {
+  animation: SlideOut 0.5s ease;
 }
 
 @keyframes taskSlideOut {
@@ -962,10 +973,6 @@ video {
 }
 
 @keyframes menuTransition {
-  0% {
-    transform: translateX(-100%);
-  }
-
   100% {
     transform: translateX(0);
   }
@@ -987,10 +994,6 @@ video {
 
 .cursor-pointer {
   cursor: pointer;
-}
-
-.cursor-none {
-  cursor: none;
 }
 
 .auto-rows-\[30px\] {
@@ -1563,6 +1566,11 @@ video {
   color: rgb(185 28 28 / var(--tw-text-opacity, 1));
 }
 
+.text-slate-700 {
+  --tw-text-opacity: 1;
+  color: rgb(51 65 85 / var(--tw-text-opacity, 1));
+}
+
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
@@ -1571,11 +1579,6 @@ video {
 .text-yellow-700 {
   --tw-text-opacity: 1;
   color: rgb(161 98 7 / var(--tw-text-opacity, 1));
-}
-
-.text-slate-700 {
-  --tw-text-opacity: 1;
-  color: rgb(51 65 85 / var(--tw-text-opacity, 1));
 }
 
 .shadow-md {
@@ -1975,5 +1978,16 @@ video {
     --tw-space-y-reverse: 0;
     margin-top: calc(0px * calc(1 - var(--tw-space-y-reverse)));
     margin-bottom: calc(0px * var(--tw-space-y-reverse));
+  }
+}
+
+@media (min-width: 1024px) {
+  .lg\:w-64 {
+    width: 16rem;
+  }
+
+  .lg\:-translate-x-0 {
+    --tw-translate-x: -0px;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
   }
 }

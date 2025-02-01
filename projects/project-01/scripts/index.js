@@ -9,18 +9,17 @@ const inputButton = document.querySelector('#inputButton');
 const searchInput = document.querySelector('#searchInput');
 const notification = document.querySelector('#dialog');
 const completedList = document.querySelector('#completed-list');
+const defaultCategories = navBlock.querySelector('#alltask');
+const personCategories = navBlock.querySelector('#personal');
+const workCategories = navBlock.querySelector('#work');
+const shoppingCategories = navBlock.querySelector('#shopping');
+const completed = navBlock.querySelector('#completed-task');
 const userKey = 'User';
 // Lấy danh sách từ Local Storage hoặc tạo mảng mới nếu chưa có
 const todos = JSON.parse(localStorage.getItem('todos')) || [];
 let completedTodos = JSON.parse(localStorage.getItem('completedTodos')) || [];
 
 // Bật/tắt menu
-function toggleMenu() {
-    menuBlock.classList.toggle('hidden');
-    menuBlock.classList.toggle('w-64');
-    menuBlock.classList.toggle('w-full');
-    menuBlock.classList.toggle('animate-menuTransition');
-}
 
 // Object app dùng để chứa tất cả các thuộc tính và function 
 const app = {
@@ -471,7 +470,6 @@ const app = {
                     _this.checkDateAndRender();
                     _this.renderLists();
                     _this.attachEvents();
-                     // Đợi một chút để cập nhật lại dữ liệu
                 } else {
                     _this.createToastMessage();
                 }
@@ -637,17 +635,6 @@ const app = {
                     }
                 }
             });
-
-
-            // Mỏ các task đã hoàn thành
-            navBlock.addEventListener('click', function(e) {
-                if (e.target.closest('button[id="completed-task"]')) {
-                    listBlock.classList.add('hidden');
-                    completedList.classList.remove('hidden');
-                }
-            })
-
-            
         })
     },
 
@@ -720,22 +707,14 @@ const app = {
         nextMonthButton.removeEventListener('click', handleNextMonth);
     
         function handleNextMonth() {
-            console.log("Next Month Clicked - Before:", currentDate.getMonth());
-            
-            currentDate.setDate(1); // Đặt về ngày 1 để tránh nhảy tháng ngoài ý muốn
+            currentDate.setDate(1);
             currentDate.setMonth(currentDate.getMonth() + 1);
-            
-            console.log("Next Month Clicked - After:", currentDate.getMonth());
             renderCalendar();
         }
         
         function handlePrevMonth() {
-            console.log("Prev Month Clicked - Before:", currentDate.getMonth());
-            
-            currentDate.setDate(1); // Đặt về ngày 1 để tránh lỗi nhảy tháng
+            currentDate.setDate(1);
             currentDate.setMonth(currentDate.getMonth() - 1);
-            
-            console.log("Prev Month Clicked - After:", currentDate.getMonth());
             renderCalendar();
         }
         
@@ -777,13 +756,42 @@ const app = {
     attachEvents: function() {
         const listItems = Array.from(listBlock.children);
         const completedItems = Array.from(completedList.children);
+
+        defaultCategories.classList.add('bg-gray-100')
+
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('button[id="openMenu"]')) {
+                menuBlock.classList.add('animate-menuTransition');
+                menuBlock.classList.remove('animate-slideOut')
+            } else if (e.target.closest('button[id="closeMenu"]')) {
+                menuBlock.classList.add('animate-slideOut');
+                menuBlock.classList.remove('animate-menuTransition');
+
+                setTimeout(() => {
+                    menuBlock.classList.remove('animate-slideOut')
+                }, 1000);
+            }
+        });
+        
         navBlock.addEventListener('click', function(e) {
+            defaultCategories.classList.remove('bg-gray-100')
+            personCategories.classList.remove('bg-gray-100')
+            workCategories.classList.remove('bg-gray-100')
+            shoppingCategories.classList.remove('bg-gray-100')
+            completed.classList.remove('bg-gray-100')
+
+            if (menuBlock.classList.contains('animate-menuTransition')) {
+                menuBlock.classList.remove('animate-menuTransition');
+                menuBlock.classList.add('animate-slideOut');
+            }
+
             listItems.forEach(item => {
                 item.classList.remove('animate-taskTransition');
             });
             setTimeout(() => {
                 switch (e.target.id) {
                     case 'alltask':
+                        e.target.classList.add('bg-gray-100');
                         listBlock.classList.remove('hidden');
                         completedList.classList.add('hidden');
                         listItems.forEach(item => {
@@ -795,6 +803,7 @@ const app = {
                     case 'personal':
                     case 'work':
                     case 'shopping':
+                        e.target.classList.add('bg-gray-100');
                         listBlock.classList.remove('hidden');
                         completedList.classList.add('hidden');
                         listItems.forEach(item => {
@@ -802,6 +811,11 @@ const app = {
                             item.style.display = itemType.includes(e.target.id) ? '' : 'none';
                             setTimeout(() => item.classList.add('animate-taskTransition'), 0);
                         });
+                        break;
+                    case 'completed-task':
+                        e.target.classList.add('bg-gray-100');
+                        listBlock.classList.add('hidden');
+                        completedList.classList.remove('hidden');
                         break;
                 }
             }, 0);
