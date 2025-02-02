@@ -649,11 +649,6 @@ video {
   width: 2rem;
 }
 
-.w-fit {
-  width: -moz-fit-content;
-  width: fit-content;
-}
-
 .w-full {
   width: 100%;
 }
@@ -676,10 +671,6 @@ video {
 
 .grid-cols-4 {
   grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-.grid-cols-\[--grid-16\] {
-  grid-template-columns: var(--grid-16);
 }
 
 .items-center {
