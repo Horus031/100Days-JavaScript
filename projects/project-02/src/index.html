@@ -20,72 +20,74 @@
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div class="lg:col-span-9">
-                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-lg">
-                    <div class="aspect-square w-full" id="canvas-container">
-                        <canvas id="pixel-grid" class="grid grid-16 gap-0.5 w-full h-full bg-gray-100 dark:bg-gray-700">
+            <div class="lg:col-span-12">
+                <div class="flex flex-col lg:flex-row justify-between bg-gray-200 dark:bg-gray-800 rounded-lg p-4 shadow-lg lg:space-x-4 space-y-4">
+                    <div class="" id="canvas-container">
+                        <canvas id="pixel-grid" class="grid grid-16 gap-0.5 w-full h-full bg-gray-100 dark:bg-gray-700 size-[512px]">
 
                         </canvas>
                     </div>
+
+                    <div class="flex-1 space-y-4">
+                        <div class="bg-white dark:bg-gray-800 dark:border-gray-400 dark:border p-4 rounded-lg shadow-lg w-full">
+                            <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">
+                                Tools
+                            </h2>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button class="tool-btn active" data-tool="pencil">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                </button>
+                                <button class="tool-btn" data-tool="eraser">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+        
+                        <div class="bg-white dark:bg-gray-800 dark:border-gray-400 dark:border p-4 rounded-lg shadow-lg">
+                            <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">
+                                Colors
+                            </h2>
+                            <input id="color-picker" type="color" class="w-full h-12 rounded cursor-pointer" value="#000000">
+                            <div class="grid grid-cols-4 gap-2 mt-4">
+                                <button class="w-8 h-8 rounded bg-black"></button>
+                                <button class="w-8 h-8 rounded bg-red-500"></button>
+                                <button class="w-8 h-8 rounded bg-blue-500"></button>
+                                <button class="w-8 h-8 rounded bg-green-500"></button>
+                                <button class="w-8 h-8 rounded bg-yellow-500"></button>
+                                <button class="w-8 h-8 rounded bg-purple-500"></button>
+                                <button class="w-8 h-8 rounded bg-pink-500"></button>
+                                <button class="w-8 h-8 rounded bg-white border border-gray-200"></button>
+                            </div>
+                        </div>
+        
+                        <div class="bg-white dark:bg-gray-800 dark:border-gray-400 dark:border p-4 rounded-lg shadow-lg">
+                            <h2 class="text-lg font-semibold text-gray-800 mb-4 dark:text-white">
+                                Grid Size
+                            </h2>
+                            <select name="" id="grid-size" class="bg-gray-100 rounded p-2 w-full text-gray-800">
+                                <option value="8">8x8</option>
+                                <option value="16" selected>16x16</option>
+                                <option value="32">32x32</option>
+                                <option value="64">64x64</option>
+                            </select>
+                        </div>
+        
+                        <div class="flex gap-2">
+                            <button class="flex-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-2 px-4">Save</button>
+                            <button class="flex-1 bg-red-500 hover:bg-red-600  text-white rounded-lg py-2 px-4">Clear</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="lg:col-span-3 space-y-4">
-                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
-                    <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">
-                        Tools
-                    </h2>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button class="tool-btn active" data-tool="pencil">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                            </svg>
-                        </button>
-                        <button class="tool-btn" data-tool="eraser">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
-                    <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">
-                        Colors
-                    </h2>
-                    <input type="color" class="w-full h-12 rounded cursor-pointer" value="#000000">
-                    <div class="grid grid-cols-4 gap-2 mt-4">
-                        <button class="w-8 h-8 rounded bg-black"></button>
-                        <button class="w-8 h-8 rounded bg-red-500"></button>
-                        <button class="w-8 h-8 rounded bg-blue-500"></button>
-                        <button class="w-8 h-8 rounded bg-green-500"></button>
-                        <button class="w-8 h-8 rounded bg-yellow-500"></button>
-                        <button class="w-8 h-8 rounded bg-purple-500"></button>
-                        <button class="w-8 h-8 rounded bg-pink-500"></button>
-                        <button class="w-8 h-8 rounded bg-white border border-gray-200"></button>
-                    </div>
-                </div>
-
-                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
-                    <h2 class="text-lg font-semibold text-gray-800 mb-4 dark:text-white">
-                        Grid Size
-                    </h2>
-                    <select name="" id="grid-size" class="bg-gray-100 rounded p-2 w-full text-gray-800">
-                        <option value="8">8x8</option>
-                        <option value="16" selected>16x16</option>
-                        <option value="32">32x32</option>
-                        <option value="64">64x64</option>
-                    </select>
-                </div>
-
-                <div class="flex gap-2">
-                    <button class="flex-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-2 px-4">Save</button>
-                    <button class="flex-1 bg-red-500 hover:bg-red-600  text-white rounded-lg py-2 px-4">Clear</button>
-                </div>
-            </div>
+            
         </div>
     </div>
 
-    <script src="./script.js"></script>
+    <script type="module" src="./scripts/app.js"></script>
 </body>
 </html>

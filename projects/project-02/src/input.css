@@ -3,7 +3,16 @@
 @tailwind utilities;
 
 @layer components {
+    .grid-8 {
+        grid-template-columns: repeat(8, minmax(0, 1fr));
+    }
     .grid-16 {
         grid-template-columns: repeat(16, minmax(0, 1fr));
+    }
+    .grid-32 {
+        grid-template-columns: repeat(32, minmax(0, 1fr));
+    }
+    .grid-64 {
+        grid-template-columns: repeat(64, minmax(0, 1fr));
     }
 }
