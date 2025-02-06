@@ -6,6 +6,7 @@ const darkModeBtn = document.querySelector('#dark-mode');
 const htmlElement = document.documentElement;
 const canvas = document.querySelector('#pixel-grid');
 const gridSelect = document.querySelector('#grid-size');
+const colorPicker = document.querySelector('#color-picker');
 
 
 const app = {
@@ -14,12 +15,16 @@ const app = {
         ui.handleSizeCanvas(canvas);
 
         // render bản vẽ dựa trên grid size
-        ui.renderCanvas(canvas, gridSelect);
+        ui.renderCanvas(canvas, gridSelect, storage);
     },
 
     handleEvents: function() {
         // Handle trạng thái dark mode
         events.handleDarkMode(darkModeBtn, htmlElement, storage);
+
+        events.handleGridSelect(canvas, gridSelect, storage);
+
+        events.handleDrawing(canvas, gridSelect, colorPicker);
     },
 
     handleResize: function() {

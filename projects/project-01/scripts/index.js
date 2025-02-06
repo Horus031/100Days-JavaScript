@@ -258,6 +258,7 @@ const app = {
             const deadlineTime = new Date(time);
             return deadlineTime.getTime();
         });
+
         // Khởi tạo biến lặp qua các
         const sortedDeadlineTodos = [...todos].sort((a, b) => {
             return new Date(a.originalDeadline) - new Date(b.originalDeadline);
