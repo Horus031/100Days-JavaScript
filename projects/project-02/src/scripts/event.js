@@ -36,16 +36,22 @@ export const events = {
         const y = Math.floor((e.clientY - rect.top) / pixelSize) * pixelSize;
         let currentColor = colorPicker.value
 
-        ctx.strokeStyle = 'black';
-        ctx.fillStyle = `${currentColor}`;
-        ctx.fillRect(x, y, pixelSize, pixelSize);
-        ctx.strokeRect(x, y, pixelSize, pixelSize);
+        return { x, y, pixelSize, currentColor};
+    },
+
+    // Hàm khởi tạo các giá trị công cụ
+    handleToolValues: function() {
+        const pencil = document.querySelector('button#pencil');
+        const eraser = document.querySelector('button#eraser')
+
+
+        return { pencil, eraser }
     },
 
     // Sự kiện chọn màu từ color picker và vẽ
     handleColorAndDraw: function(canvas, gridSelect, colorPicker, configHandler, ctx, recentColors) {
         let storageColors = configHandler.getConfig('storageColors');
-        const pencil = document.querySelector('button#pencil');
+        const { pencil }  = events.handleToolValues();
 
         // Nếu local storage không phải array, thì chuyển về để xử lý duyệt mảngs
         if (!Array.isArray(storageColors)) {
@@ -71,17 +77,24 @@ export const events = {
         // Lắng nghe sự kiện click vào mỗi ô pixel
         canvas.addEventListener('click', function(e) {
             if (pencil.hasAttribute('active')) {
-                events.handleDrawValues(e, gridSelect, canvas, ctx, colorPicker);
+                const { x, y, pixelSize, currentColor} = events.handleDrawValues(e, gridSelect, canvas, ctx, colorPicker);
+                ctx.strokeStyle = 'black';
+                ctx.fillStyle = `${currentColor}`;
+                ctx.fillRect(x, y, pixelSize, pixelSize);
+                ctx.strokeRect(x, y, pixelSize, pixelSize);
             }
         })
         
     },
 
-    handleEraser: function(canvas) {
-        const eraser = document.querySelector('button#eraser')
+    handleEraser: function(canvas, gridSelect, ctx, colorPicker) {
         canvas.addEventListener('click', function(e) {
+            const { eraser } = events.handleToolValues();
             if (eraser.hasAttribute('active')) {
-                console.log('true');
+                const { x, y, pixelSize} = events.handleDrawValues(e, gridSelect, canvas, ctx, colorPicker);
+                ctx.strokeStyle = 'black';
+                ctx.clearRect(x, y, pixelSize, pixelSize);
+                ctx.strokeRect(x, y, pixelSize, pixelSize);
             }
         })
     },
@@ -100,14 +113,28 @@ export const events = {
     },
 
     // Xử lý sự kiện đè chuột để tô nhiều pixel
-    handleHoldDrawing: function(canvas, gridSelect, ctx, colorPicker) {        
+    handleHoldDrawing: function(canvas, gridSelect, ctx, colorPicker) {
+        const { pencil, eraser } = events.handleToolValues();
         canvas.addEventListener('mousedown', function(e) {
             events.isMouseDown = true;
         })
 
         canvas.addEventListener('mousemove', function(e) {
             if (events.isMouseDown) {
-                events.handleDrawValues(e, gridSelect, canvas, ctx, colorPicker);
+                if (pencil.hasAttribute('active')) {
+                    const { x, y, pixelSize, currentColor} = events.handleDrawValues(e, gridSelect, canvas, ctx, colorPicker);
+                    ctx.strokeStyle = 'black';
+                    ctx.lineWidth = 0.5;
+                    ctx.fillStyle = `${currentColor}`;
+                    ctx.fillRect(x, y, pixelSize, pixelSize);
+                    ctx.strokeRect(x, y, pixelSize, pixelSize);
+                } else if (eraser.hasAttribute('active')) {
+                    const { x, y, pixelSize } = events.handleDrawValues(e, gridSelect, canvas, ctx, colorPicker);
+                    ctx.strokeStyle = 'black';
+                    ctx.lineWidth = 0.5;
+                    ctx.clearRect(x, y, pixelSize, pixelSize);
+                    ctx.strokeRect(x, y, pixelSize, pixelSize);
+                }
             }
         })
 
@@ -118,8 +145,6 @@ export const events = {
         canvas.addEventListener('mouseout', function(e) {
             events.isMouseDown = false;
         })
-            
-        
     },
 
     // Sự kiện chọn công cụ

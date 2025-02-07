@@ -30,10 +30,11 @@ const app = {
         events.handleDarkMode(darkModeBtn, htmlElement, storage);
         // Sự kiện chọn khung pixel
         events.handleGridSelect(canvas, gridSelect, storage);
+
         // Sự kiện chọn màu và vẽ
         events.handleColorAndDraw(canvas, gridSelect, colorPicker, storage, ctx, recentColors);
 
-        events.handleEraser(canvas);
+        events.handleEraser(canvas, gridSelect, ctx, colorPicker);
 
         events.handleHoldDrawing(canvas, gridSelect, ctx, colorPicker);
 

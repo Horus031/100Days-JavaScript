@@ -23,6 +23,7 @@ export const ui = {
         for (let y = 0; y < gridSize; y++) {
             for(let x = 0; x < gridSize; x++) {
                 ctx.strokeStyle = 'black';
+                ctx.lineWidth = 0.5;
                 ctx.strokeRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
             }
         }
