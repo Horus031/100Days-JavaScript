@@ -28,18 +28,26 @@ const app = {
     handleEvents: function() {
         // Handle trạng thái dark mode
         events.handleDarkMode(darkModeBtn, htmlElement, storage);
+
         // Sự kiện chọn khung pixel
         events.handleGridSelect(canvas, gridSelect, storage);
 
         // Sự kiện chọn màu và vẽ
         events.handleColorAndDraw(canvas, gridSelect, colorPicker, storage, ctx, recentColors);
 
+        // Sự kiện bôi/xóa canvas
         events.handleEraser(canvas, gridSelect, ctx, colorPicker);
 
+        // Sự kiện lấy màu từ canvas
+        events.handleEyedropper(canvas, gridSelect, ctx, colorPicker);
+
+        // Sự kiện đè chuột tô nhiều pixel
         events.handleHoldDrawing(canvas, gridSelect, ctx, colorPicker);
 
+        // Sự kiện lưu các màu đã chọn gần đây
         events.handleRecentColors(recentColors, colorPicker);
 
+        // Sự kiện thuộc tính cho tool đang sử dụng
         events.handleActiveTools();
         
         events.clearCanvas(clearButton, canvas, gridSelect)

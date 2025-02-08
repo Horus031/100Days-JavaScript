@@ -12,10 +12,8 @@ export const events = {
         let darkMode = configHandler.getConfig('isDark');
         if (darkMode) {
             htmlElement.classList.add('dark');
-            console.log('dark');
         } else {
             htmlElement.classList.remove('dark');
-            console.log('light');
         }
     },
 
@@ -36,16 +34,21 @@ export const events = {
         const y = Math.floor((e.clientY - rect.top) / pixelSize) * pixelSize;
         let currentColor = colorPicker.value
 
-        return { x, y, pixelSize, currentColor};
+        return { x, y, pixelSize, currentColor, rect};
     },
 
     // Hàm khởi tạo các giá trị công cụ
     handleToolValues: function() {
         const pencil = document.querySelector('button#pencil');
-        const eraser = document.querySelector('button#eraser')
+        const eraser = document.querySelector('button#eraser');
+        const eyedropper = document.querySelector('button#eyedropper');
+        const croppedCanvas = document.querySelector("#croppedCanvas");
+        const croppedCtx = croppedCanvas.getContext('2d', { willReadFrequently: true });
+        const cropSize = 100;
+        
 
 
-        return { pencil, eraser }
+        return { pencil, eraser, eyedropper, croppedCanvas, cropSize, croppedCtx };
     },
 
     // Sự kiện chọn màu từ color picker và vẽ
@@ -91,13 +94,49 @@ export const events = {
         canvas.addEventListener('click', function(e) {
             const { eraser } = events.handleToolValues();
             if (eraser.hasAttribute('active')) {
-                const { x, y, pixelSize} = events.handleDrawValues(e, gridSelect, canvas, ctx, colorPicker);
+                const { x, y, pixelSize } = events.handleDrawValues(e, gridSelect, canvas, ctx, colorPicker);
                 ctx.strokeStyle = 'black';
                 ctx.clearRect(x, y, pixelSize, pixelSize);
                 ctx.strokeRect(x, y, pixelSize, pixelSize);
             }
         })
     },
+
+    rgbToHex: function(r, g, b) {
+        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+    },
+
+    handleEyedropper: function(canvas, gridSelect, ctx, colorPicker) {
+        const { eyedropper, croppedCanvas, cropSize, croppedCtx } = events.handleToolValues();
+        canvas.addEventListener('mousemove', function(e) {
+            if (eyedropper.hasAttribute('active')) {
+                croppedCanvas.classList.remove('hidden');
+                const { rect } = events.handleDrawValues(e, gridSelect, canvas, ctx, colorPicker);
+
+                const cursorX = e.clientX - rect.left;
+                const cursorY = e.clientY - rect.top;
+
+
+                // Lấy ảnh xung quanh con trỏ
+                const startX = Math.max(0, cursorX - cropSize / 2);
+                const startY = Math.max(0, cursorY - cropSize / 2);
+
+
+                const croppedImage = ctx.getImageData(startX, startY, cropSize, cropSize);
+
+                // Hiển thị ảnh đã cắt
+                croppedCanvas.width = cropSize;
+                croppedCanvas.height = cropSize;
+                croppedCtx.putImageData(croppedImage, 0, 0);
+            }
+        })
+
+        canvas.addEventListener('mouseout', function() {
+            croppedCanvas.classList.add('hidden');
+        })
+    },
+
+    
 
     // Xử lý sự kiện chọn màu trong bảng màu gần đây
     handleRecentColors: function(currentColors, colorPicker) {
@@ -164,7 +203,7 @@ export const events = {
                 switch (toolType) {
                     case 'pencil':
                     case 'eraser':
-                    case 'color-picker':
+                    case 'eyedropper':
                         tool.classList.add('bg-gray-300', 'dark:bg-gray-500')
                         tool.setAttribute('active', 'true');
                 }

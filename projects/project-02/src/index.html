@@ -26,6 +26,8 @@
                         <canvas id="pixel-grid" class="grid grid-16 w-full bg-gray-100">
 
                         </canvas>
+
+                        
                     </div>
 
                     <div class="flex-1 space-y-4">
@@ -47,12 +49,10 @@
                                     </svg>
                                 </button>
 
-                                <button id="colorpick" class="w-fit active:scale-90 rounded-full " data-tool="color-picker">
-                                    <svg xmlns="http://www.w3.org/2000/svg"  class="h-10 w-10 fill-none p-2 stroke-black stroke-2 dark:stroke-white" viewBox="0 0 48 48">
-                                        <path class="a" d="M39,5.5H7.5a2,2,0,0,0-2,2v33a2,2,0,0,0,2,2h33a2,2,0,0,0,2-2V8.2"/>
-                                        <path class="a" d="M36,8c2.5-.66,3-2.87,5-5s5.46,1.51,3.5,3.5-4.35,2.55-4.9,4.9m-2,2L25,26.1a2.7,2.7,0,0,1-2.6.4s-1.25,1.38-2,.5.5-1.8.5-1.8a2.78,2.78,0,0,1,.5-2.6L34,10m-1,8H26m12.8-3.6,1.9-1.9L34.8,7,32.9,8.9Z"/>
-                                        <path class="a" d="M25.1,26l2.14,2.22a.7.7,0,0,0,1,0l1.38-1.38a.72.72,0,0,1,1,0l7.81,7.81a.7.7,0,0,1-.5,1.2H10.1a.7.7,0,0,1-.58-1.1L19,21.13A.7.7,0,0,1,20,21l1.48,1.5"/>
-                                    </svg>
+                                <button id="eyedropper" class="w-fit active:scale-90 rounded-full " data-tool="eyedropper">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 dark:text-white p-2" fill="currentColor" class="bi bi-eyedropper" viewBox="0 0 16 16">
+                                        <path d="M13.354.646a1.207 1.207 0 0 0-1.708 0L8.5 3.793l-.646-.647a.5.5 0 1 0-.708.708L8.293 5l-7.147 7.146A.5.5 0 0 0 1 12.5v1.793l-.854.853a.5.5 0 1 0 .708.707L1.707 15H3.5a.5.5 0 0 0 .354-.146L11 7.707l1.146 1.147a.5.5 0 0 0 .708-.708l-.647-.646 3.147-3.146a1.207 1.207 0 0 0 0-1.708zM2 12.707l7-7L10.293 7l-7 7H2z"/>
+                                     </svg>
                                 </button>
                             </div>
                         </div>
@@ -85,6 +85,12 @@
                             <button id="save-btn" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-2 px-4">Save</button>
                             <button id="clear-btn" class="flex-1 bg-red-500 hover:bg-red-600  text-white rounded-lg py-2 px-4">Clear</button>
                         </div>
+
+                        <div class="">
+                            <canvas id="croppedCanvas" class="border border-black hidden">
+        
+                            </canvas>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -92,6 +98,8 @@
             
         </div>
     </div>
+
+    
 
     <script type="module" src="./scripts/app.js"></script>
 </body>
