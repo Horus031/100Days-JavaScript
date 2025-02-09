@@ -2,7 +2,6 @@ import { ui } from "./ui.js";
 
 export const events = {
     isMouseDown: false,
-    currentColor: undefined,
     handleDarkMode: function(button, htmlElement, configHandler) {
         button.addEventListener('click', () => {
             const isDark = htmlElement.classList.toggle('dark');
@@ -47,9 +46,34 @@ export const events = {
         const cropSize = 100;
         
 
-
         return { pencil, eraser, eyedropper, croppedCanvas, cropSize, croppedCtx };
     },
+
+    // handleHoverPixels: function(canvas, gridSelect, ctx, colorPicker, offScreenCanvas, offScreenCtx) {
+    //     offScreenCanvas.width = canvas.width;
+    //     offScreenCanvas.height = canvas.height;
+
+    //     // Copy the initial canvas content to the off-screen canvas
+    //     offScreenCtx.drawImage(canvas, 0, 0);
+
+    //     canvas.addEventListener('mousemove', function(e) {
+    //         const { x, y, pixelSize } = events.handleDrawValues(e, gridSelect, canvas, ctx, colorPicker);
+
+    //         // Xóa canvas & vẽ lại ảnh gốc
+    //         ctx.clearRect(0, 0, canvas.width, canvas.height);
+    //         ctx.drawImage(offScreenCanvas, 0, 0);
+
+    //         // Hover hiệu ứng mờ
+    //         ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+    //         ctx.fillRect(x, y, pixelSize, pixelSize);
+    //     })
+
+    //     canvas.addEventListener("mouseleave", () => {
+    //         ctx.clearRect(0, 0, canvas.width, canvas.height);
+    //         ctx.drawImage(offScreenCanvas, 0, 0); // Xóa hiệu ứng khi rời chuột khỏi canvas
+    //         ui.renderCanvas(canvas, gridSelect);
+    //     });
+    // },
 
     // Sự kiện chọn màu từ color picker và vẽ
     handleColorAndDraw: function(canvas, gridSelect, colorPicker, configHandler, ctx, recentColors) {
@@ -90,6 +114,7 @@ export const events = {
         
     },
 
+    // Sự kiện xóa
     handleEraser: function(canvas, gridSelect, ctx, colorPicker) {
         canvas.addEventListener('click', function(e) {
             const { eraser } = events.handleToolValues();
@@ -102,41 +127,49 @@ export const events = {
         })
     },
 
-    rgbToHex: function(r, g, b) {
-        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
-    },
-
+    // Sự kiện pick màu từ canvas
     handleEyedropper: function(canvas, gridSelect, ctx, colorPicker) {
         const { eyedropper, croppedCanvas, cropSize, croppedCtx } = events.handleToolValues();
         canvas.addEventListener('mousemove', function(e) {
             if (eyedropper.hasAttribute('active')) {
                 croppedCanvas.classList.remove('hidden');
                 const { rect } = events.handleDrawValues(e, gridSelect, canvas, ctx, colorPicker);
-
+    
                 const cursorX = e.clientX - rect.left;
                 const cursorY = e.clientY - rect.top;
-
-
+    
                 // Lấy ảnh xung quanh con trỏ
                 const startX = Math.max(0, cursorX - cropSize / 2);
                 const startY = Math.max(0, cursorY - cropSize / 2);
-
-
+    
                 const croppedImage = ctx.getImageData(startX, startY, cropSize, cropSize);
-
+    
                 // Hiển thị ảnh đã cắt
                 croppedCanvas.width = cropSize;
                 croppedCanvas.height = cropSize;
                 croppedCtx.putImageData(croppedImage, 0, 0);
             }
-        })
-
+        });
+    
+        canvas.addEventListener('click', function(e) {
+            if (eyedropper.hasAttribute('active')) {
+                const { x, y } = events.handleDrawValues(e, gridSelect, canvas, ctx, colorPicker);
+                const pixelData = ctx.getImageData(x, y, 1, 1).data; // Get data for a single pixel
+                console.log(pixelData);
+                const color = `rgb(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]})`;
+                console.log(`Color at (${x}, ${y}): ${color}`);
+                colorPicker.value = events.rgbToHex(pixelData[0], pixelData[1], pixelData[2]);
+            }
+        });
+    
         canvas.addEventListener('mouseout', function() {
             croppedCanvas.classList.add('hidden');
-        })
+        });
     },
 
-    
+    rgbToHex: function(r, g, b) {
+        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+    },
 
     // Xử lý sự kiện chọn màu trong bảng màu gần đây
     handleRecentColors: function(currentColors, colorPicker) {
@@ -167,6 +200,7 @@ export const events = {
                     ctx.fillStyle = `${currentColor}`;
                     ctx.fillRect(x, y, pixelSize, pixelSize);
                     ctx.strokeRect(x, y, pixelSize, pixelSize);
+
                 } else if (eraser.hasAttribute('active')) {
                     const { x, y, pixelSize } = events.handleDrawValues(e, gridSelect, canvas, ctx, colorPicker);
                     ctx.strokeStyle = 'black';
@@ -216,5 +250,5 @@ export const events = {
         clearButton.addEventListener('click', function() {
             ui.renderCanvas(canvas, gridSelect)
         })
-    }
+    },
 } 

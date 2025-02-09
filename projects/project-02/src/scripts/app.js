@@ -10,6 +10,9 @@ const gridSelect = document.querySelector('#grid-size');
 const colorPicker = document.querySelector('#color-picker');
 const recentColors = document.querySelector('#recent-colors');
 const clearButton = document.querySelector('#clear-btn');
+const offScreenCanvas = document.createElement('canvas');
+const offScreenCtx = offScreenCanvas.getContext('2d');
+
 
 
 
